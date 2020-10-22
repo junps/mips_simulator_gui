@@ -4,6 +4,19 @@
 #include <QMainWindow>
 #include "form.h"
 
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <vector>
+#include <map>
+#include <bitset>
+
+#include "simulator.h"
+
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
 QT_END_NAMESPACE
@@ -26,6 +39,8 @@ private slots:
 
     void on_spinBox_valueChanged(int arg1);
 
+    void on_pushButton_Restart_released();
+
 private:
     Ui::MainWindow *ui;
     Form *form;
@@ -37,6 +52,13 @@ private:
     void shift_simu_ary_next();
 
     int next_step = 1;
+
+    QString file_name;
+
+    Simulator* simu_ary[5];
+
+    Simulator* simu;
+
 };
 #endif // MAINWINDOW_H
 

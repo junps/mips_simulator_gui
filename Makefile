@@ -1317,27 +1317,9 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		form.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/QWidget \
 		ui_mainwindow.h \
-		../../../opt/anaconda3/include/qt/QtCore/QVariant \
-		../../../opt/anaconda3/include/qt/QtWidgets/QAction \
-		../../../opt/anaconda3/include/qt/QtWidgets/qaction.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qactiongroup.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QApplication \
-		../../../opt/anaconda3/include/qt/QtWidgets/qapplication.h \
-		../../../opt/anaconda3/include/qt/QtCore/qcoreapplication.h \
-		../../../opt/anaconda3/include/qt/QtCore/qeventloop.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qdesktopwidget.h \
-		../../../opt/anaconda3/include/qt/QtGui/qguiapplication.h \
-		../../../opt/anaconda3/include/qt/QtGui/qinputmethod.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QButtonGroup \
-		../../../opt/anaconda3/include/qt/QtWidgets/qbuttongroup.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QGridLayout \
-		../../../opt/anaconda3/include/qt/QtWidgets/qgridlayout.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qlayout.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qlayoutitem.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qboxlayout.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QHBoxLayout \
-		../../../opt/anaconda3/include/qt/QtWidgets/QHeaderView \
-		../../../opt/anaconda3/include/qt/QtWidgets/qheaderview.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QTableWidget \
+		../../../opt/anaconda3/include/qt/QtWidgets/qtablewidget.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qtableview.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qabstractitemview.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qabstractscrollarea.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qframe.h \
@@ -1353,22 +1335,6 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qstyle.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qtabbar.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qrubberband.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QMenuBar \
-		../../../opt/anaconda3/include/qt/QtWidgets/qmenubar.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qmenu.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QPushButton \
-		../../../opt/anaconda3/include/qt/QtWidgets/qpushbutton.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qabstractbutton.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QSpacerItem \
-		../../../opt/anaconda3/include/qt/QtWidgets/QSpinBox \
-		../../../opt/anaconda3/include/qt/QtWidgets/qspinbox.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QStatusBar \
-		../../../opt/anaconda3/include/qt/QtWidgets/qstatusbar.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QTabWidget \
-		../../../opt/anaconda3/include/qt/QtWidgets/QTableWidget \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtablewidget.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtableview.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QVBoxLayout \
 		../../../opt/anaconda3/include/qt/QtWidgets/QTableWidgetItem \
 		../../../opt/anaconda3/include/qt/QtWidgets/QFileDialog \
 		../../../opt/anaconda3/include/qt/QtWidgets/qfiledialog.h \

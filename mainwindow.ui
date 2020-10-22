@@ -20,7 +20,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>1</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -61,6 +61,9 @@
         </item>
         <item>
          <widget class="QSpinBox" name="spinBox">
+          <property name="maximum">
+           <number>100000000</number>
+          </property>
           <property name="value">
            <number>1</number>
           </property>
@@ -84,6 +87,13 @@
          <widget class="QPushButton" name="pushButton_Open">
           <property name="text">
            <string>Open</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_Restart">
+          <property name="text">
+           <string>Restart</string>
           </property>
          </widget>
         </item>
