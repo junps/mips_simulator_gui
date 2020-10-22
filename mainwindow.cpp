@@ -15,8 +15,6 @@ using namespace std;
 #include "simu_functions.h"
 #include "instruction.h"
 
-using namespace std;
-
 #define MEMORY_SIZE (2000000000)
 
 #define _NOW 2
@@ -85,32 +83,8 @@ void MainWindow::on_pushButton_Quit_released()
 
 void MainWindow::InitialTableDisplay()
 {
-
-    ui->tableWidget_Memory->setRowCount(33);
-    ui->tableWidget_Memory->setColumnCount(5);
-
-    QStringList vlabels2;
-    vlabels2 << "ZERO" << "AT" << "V0" << "V1" << "A0" << "A1" << "A2" << "A3" << "T0" << "T1"
-            << "T2" << "T3" << "T4" << "T5" << "T6" << "T7" << "S0" << "S1" << "S2" << "S3"
-            << "S4" << "S5" << "S6" << "S7" << "T8" << "T9" << "K0" << "K1" << "GP" << "SP" << "FP" << "RA" << "N_pc";
-    ui->tableWidget_Memory->setVerticalHeaderLabels(vlabels2);
-
-    QStringList hlabels2;
-    hlabels2 << "prepre" << "pre" << "now" << "next" << "nextnext";
-    ui->tableWidget_Memory->setHorizontalHeaderLabels(hlabels2);
-
-    for(int i = 0; i < 33; i++) {
-        for (int j = 0; j < 5; j++) {
-            QTableWidgetItem *item = new QTableWidgetItem;
-            item->setText(QString::number(0, 16));
-            ui->tableWidget_Memory->setItem(i, j, item);
-        }
-    }
-
-    ui->tableWidget_Memory->setAlternatingRowColors(true);
-
     ui->tableWidget_Registers->setRowCount(33);
-    ui->tableWidget_Registers->setColumnCount(5);
+    ui->tableWidget_Registers->setColumnCount(3);
 
     QStringList vlabels;
     vlabels << "ZERO" << "AT" << "V0" << "V1" << "A0" << "A1" << "A2" << "A3" << "T0" << "T1"
@@ -119,11 +93,11 @@ void MainWindow::InitialTableDisplay()
     ui->tableWidget_Registers->setVerticalHeaderLabels(vlabels);
 
     QStringList hlabels;
-    hlabels << "prepre" << "pre" << "now" << "next" << "nextnext";
+    hlabels << "pre" << "now" << "next";
     ui->tableWidget_Registers->setHorizontalHeaderLabels(hlabels);
 
     for(int i = 0; i < 33; i++) {
-        for (int j = 0; j < 5; j++) {
+        for (int j = 0; j < 3; j++) {
             QTableWidgetItem *item = new QTableWidgetItem;
             item->setText(QString::number(0, 16));
             ui->tableWidget_Registers->setItem(i, j, item);
@@ -132,30 +106,84 @@ void MainWindow::InitialTableDisplay()
 
     ui->tableWidget_Registers->setAlternatingRowColors(true);
 
+    ui->tableWidget_Memory->setRowCount(l_lis.ini_sp);
+    ui->tableWidget_Memory->setColumnCount(3);
+
+    QStringList vlabels2;
+    for(int i = 0; i <= l_lis.ini_sp; i++) {
+        vlabels << QString::number(i);
+    }
+    ui->tableWidget_Memory->setVerticalHeaderLabels(vlabels2);
+
+    QStringList hlabels2;
+    hlabels2 << "pre" << "now" << "next";
+    ui->tableWidget_Memory->setHorizontalHeaderLabels(hlabels2);
+
+    for(int i = 0; i <= l_lis.ini_sp; i++) {
+        for (int j = 0; j < 3; j++) {
+            QTableWidgetItem *item = new QTableWidgetItem;
+            item->setText(QString::number(0, 16));
+            ui->tableWidget_Memory->setItem(i, j, item);
+        }
+    }
+    ui->tableWidget_Memory->scrollToBottom();
+
+    ui->tableWidget_Memory->setAlternatingRowColors(true);
+
 }
 
 void MainWindow::update_register_table()
 {
-    for(int i = 0; i < 5; i++) {
-        for (int j = 0; j < 32; j++) {
-            QTableWidgetItem *item = new QTableWidgetItem;
-            item->setText(QString::number(simu_ary[i]->registers[j], 16));
-            ui->tableWidget_Registers->setItem(j, i, item);
-        }
+//    for(int i = 0; i < 5; i++) {
+//        for (int j = 0; j < 32; j++) {
+//            QTableWidgetItem *item = new QTableWidgetItem;
+//            item->setText(QString::number(simu_ary[i]->registers[j], 16));
+//            ui->tableWidget_Registers->setItem(j, i, item);
+//        }
+//        QTableWidgetItem *item = new QTableWidgetItem;
+//        item->setText(QString::number(simu_ary[i]->pc, 16));
+//        ui->tableWidget_Registers->setItem(32, i, item);
+//    }
+    // now_node
+    for(int i = 0; i < 32; i++) {
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(simu_ary[i]->pc, 16));
-        ui->tableWidget_Registers->setItem(32, i, item);
+        item->setText(QString::number(l_lis.now_node->registers[i], 16));
+        ui->tableWidget_Registers->setItem(i, 1, item);
     }
+    QTableWidgetItem *item1 = new QTableWidgetItem;
+    item1->setText(QString::number(l_lis.now_node->pc, 16));
+    ui->tableWidget_Registers->setItem(32, 1, item1);
+
+    // now_node->prev
+    for(int i = 0; i < 32; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(l_lis.now_node->prev->registers[i], 16));
+        ui->tableWidget_Registers->setItem(i, 0, item);
+    }
+    QTableWidgetItem *item0 = new QTableWidgetItem;
+    item0->setText(QString::number(l_lis.now_node->prev->pc, 16));
+    ui->tableWidget_Registers->setItem(32, 0, item0);
+
+    //now_node->next
+    for(int i = 0; i < 32; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(l_lis.now_node->next->registers[i], 16));
+        ui->tableWidget_Registers->setItem(i, 2, item);
+    }
+    QTableWidgetItem *item2 = new QTableWidgetItem;
+    item2->setText(QString::number(l_lis.now_node->next->pc, 16));
+    ui->tableWidget_Registers->setItem(32, 2, item2);
+
 
     for(int i = 0; i < 32; i++) {
-        if(ui->tableWidget_Registers->item(i, 1)->text() != ui->tableWidget_Registers->item(i, 2)->text()) {
-            ui->tableWidget_Registers->item(i, 1)->setBackground(Qt::red);
-            ui->tableWidget_Registers->item(i, 2)->setBackground(Qt::green);
+        if(ui->tableWidget_Registers->item(i, 0)->text() != ui->tableWidget_Registers->item(i, 1)->text()) {
+            ui->tableWidget_Registers->item(i, 0)->setBackground(Qt::red);
+            ui->tableWidget_Registers->item(i, 1)->setBackground(Qt::green);
         }
     }
-    if(ui->tableWidget_Registers->item(32, 1)->text() != ui->tableWidget_Registers->item(32, 2)->text()) {
-        ui->tableWidget_Registers->item(32, 1)->setBackground(Qt::red);
-        ui->tableWidget_Registers->item(32, 2)->setBackground(Qt::green);
+    if(ui->tableWidget_Registers->item(32, 0)->text() != ui->tableWidget_Registers->item(32, 1)->text()) {
+        ui->tableWidget_Registers->item(32, 0)->setBackground(Qt::red);
+        ui->tableWidget_Registers->item(32, 1)->setBackground(Qt::green);
     }
 }
 
@@ -218,10 +246,33 @@ void MainWindow::on_pushButton_Next_released()
             exit(1);
         }
 
+        cout << "fff" << endl;
+
+
         instructions[opcode][funct](simu);
-        shift_simu_ary_next();
-        update_register_table();
+        // shift_simu_ary_next();
         form->heigh_light_row(simu->pc / 4);
+
+        cout << "eee" << endl;
+
+        if(l_lis.now_node->next == l_lis.boss) {
+            cout << "ddd" << endl;
+            l_lis.create_new(simu);
+            cout << "hello" <<endl;
+            l_lis.siz++;
+            if(l_lis.siz > l_lis.mx_siz) {
+                l_lis.boss->next = l_lis.boss->next->next;
+                free(l_lis.boss->next->prev->stack);
+                free(l_lis.boss->next->prev);
+                l_lis.boss->next->prev = l_lis.boss;
+                l_lis.siz--;
+            }
+        } else {
+            l_lis.now_node = l_lis.now_node->next;
+        }
+
+        update_register_table();
+
         loop_num++;
     }
 
@@ -265,6 +316,8 @@ void MainWindow::on_pushButton_Restart_released()
     for (int i = 0; i < 5; i++) {
         simu_ary[i] = create_simu(MEMORY_SIZE, 0, 0);
     }
+
+    l_lis.delete_whole_l();
 
     InitialTableDisplay();
 }

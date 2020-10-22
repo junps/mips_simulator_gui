@@ -59,6 +59,7 @@ private:
 
     Simulator* simu;
 
+    Simu_linked_list l_lis;
 };
 #endif // MAINWINDOW_H
 
