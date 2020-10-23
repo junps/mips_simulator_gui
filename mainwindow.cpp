@@ -50,8 +50,6 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    form = new Form;
-    form->show();
     InitialTableDisplay();
 
     init_instructions();
@@ -72,10 +70,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_pushButton_Quit_released()
-{
-    form->close();
-}
 
 void MainWindow::InitialTableDisplay()
 {
@@ -204,12 +198,38 @@ void MainWindow::update_memory_table()
     }
 }
 
+void MainWindow::displayFile(QString file_name)
+{
+    QFile file(file_name);
+    if(!file.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"title","cannot open the file");
+    }
+    QTextStream in(&file);
+    QString input_text = in.readLine();
+    int i = 0;
+    while(!input_text.isNull()) {
+        QListWidgetItem *item = new QListWidgetItem;
+        item->setText(QString::number(i) + "    " + input_text);
+        ui->listWidget_Code->addItem(item);
+        input_text = in.readLine(256);
+        i++;
+    }
+    file.close();
+    heigh_light_row(0);
+}
+
+void MainWindow::heigh_light_row(int row)
+{
+    ui->listWidget_Code->setCurrentRow(row);
+    ui->listWidget_Code->scrollToItem(ui->listWidget_Code->currentItem());
+}
+
 
 void MainWindow::on_pushButton_Open_released()
 {
     file_name = QFileDialog::getOpenFileName(this, "open a file","");
 
-    form->displayFile(file_name);
+    displayFile(file_name);
 
     QFile file(file_name);
     if(!file.open(QFile::ReadOnly | QFile::Text)) {
@@ -248,7 +268,7 @@ void MainWindow::on_pushButton_Next_released()
         }
 
         instructions[opcode][funct](simu);
-        form->heigh_light_row(simu->pc / 4);
+        heigh_light_row(simu->pc / 4);
 
         if(l_lis.now_node->next == l_lis.boss) {
             l_lis.create_new(simu);
@@ -279,7 +299,7 @@ void MainWindow::on_spinBox_valueChanged(int arg1)
 
 void MainWindow::on_pushButton_Restart_released()
 {
-    form->heigh_light_row(0);
+    heigh_light_row(0);
 
     QFile file(file_name);
     if(!file.open(QFile::ReadOnly | QFile::Text)) {
@@ -312,40 +332,40 @@ void MainWindow::on_pushButton_Restart_released()
     InitialTableDisplay();
 }
 
-void MainWindow::on_pushButton_Back_released()
-{
-    int loop_num = 0;
-    while(loop_num < next_step) {
-        uint32_t opcode = get_opcode(simu);
-        uint32_t funct = get_func(simu);
+//void MainWindow::on_pushButton_Back_released()
+//{
+//    int loop_num = 0;
+//    while(loop_num < next_step) {
+//        uint32_t opcode = get_opcode(simu);
+//        uint32_t funct = get_func(simu);
 
-        if(opcode == 0b111111) return;
+//        if(opcode == 0b111111) return;
 
-        if (instructions[opcode][funct] == NULL) {
-            printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-            exit(1);
-        }
+//        if (instructions[opcode][funct] == NULL) {
+//            printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+//            exit(1);
+//        }
 
-        instructions[opcode][funct](simu);
-        form->heigh_light_row(simu->pc / 4);
+//        instructions[opcode][funct](simu);
+//        form->heigh_light_row(simu->pc / 4);
 
-        if(l_lis.now_node->next == l_lis.boss) {
-            l_lis.create_new(simu);
-            l_lis.siz++;
-            if(l_lis.siz > l_lis.mx_siz) {
-                l_lis.boss->next = l_lis.boss->next->next;
-                free(l_lis.boss->next->prev->stack);
-                free(l_lis.boss->next->prev);
-                l_lis.boss->next->prev = l_lis.boss;
-                l_lis.siz--;
-            }
-        } else {
-            l_lis.now_node = l_lis.now_node->next;
-        }
+//        if(l_lis.now_node->next == l_lis.boss) {
+//            l_lis.create_new(simu);
+//            l_lis.siz++;
+//            if(l_lis.siz > l_lis.mx_siz) {
+//                l_lis.boss->next = l_lis.boss->next->next;
+//                free(l_lis.boss->next->prev->stack);
+//                free(l_lis.boss->next->prev);
+//                l_lis.boss->next->prev = l_lis.boss;
+//                l_lis.siz--;
+//            }
+//        } else {
+//            l_lis.now_node = l_lis.now_node->next;
+//        }
 
-        update_register_table();
-        update_memory_table();
+//        update_register_table();
+//        update_memory_table();
 
-        loop_num++;
-    }
-}
+//        loop_num++;
+//    }
+//}

@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "form.h"
 
 #include <iostream>
 #include <stdio.h>
@@ -33,19 +32,16 @@ private slots:
 
     void on_pushButton_Open_released();
 
-    void on_pushButton_Quit_released();
-
     void on_pushButton_Next_released();
 
     void on_spinBox_valueChanged(int arg1);
 
     void on_pushButton_Restart_released();
 
-    void on_pushButton_Back_released();
+//    void on_pushButton_Back_released();
 
 private:
     Ui::MainWindow *ui;
-    Form *form;
 
     void InitialTableDisplay();
 
@@ -62,6 +58,10 @@ private:
     Simulator* simu;
 
     Simu_linked_list l_lis;
+
+    void displayFile(QString file_name);
+
+    void heigh_light_row(int row);
 };
 #endif // MAINWINDOW_H
 

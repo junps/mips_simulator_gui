@@ -50,18 +50,14 @@ OBJECTS_DIR   = ./
 
 ####### Files
 
-SOURCES       = form.cpp \
-		instruction.cpp \
+SOURCES       = instruction.cpp \
 		main.cpp \
 		mainwindow.cpp \
-		simu_functions.cpp moc_form.cpp \
-		moc_mainwindow.cpp
-OBJECTS       = form.o \
-		instruction.o \
+		simu_functions.cpp moc_mainwindow.cpp
+OBJECTS       = instruction.o \
 		main.o \
 		mainwindow.o \
 		simu_functions.o \
-		moc_form.o \
 		moc_mainwindow.o
 DIST          = ../../../opt/anaconda3/mkspecs/features/spec_pre.prf \
 		../../../opt/anaconda3/mkspecs/qdevice.pri \
@@ -247,12 +243,10 @@ DIST          = ../../../opt/anaconda3/mkspecs/features/spec_pre.prf \
 		../../../opt/anaconda3/mkspecs/features/exceptions.prf \
 		../../../opt/anaconda3/mkspecs/features/yacc.prf \
 		../../../opt/anaconda3/mkspecs/features/lex.prf \
-		mips_simulator_gui.pro form.h \
-		instruction.h \
+		mips_simulator_gui.pro instruction.h \
 		mainwindow.h \
 		simu_functions.h \
-		simulator.h form.cpp \
-		instruction.cpp \
+		simulator.h instruction.cpp \
 		main.cpp \
 		mainwindow.cpp \
 		simu_functions.cpp
@@ -269,7 +263,7 @@ EXPORT_ARCH_ARGS = $(foreach arch, $(if $(EXPORT_ACTIVE_ARCHS), $(EXPORT_ACTIVE_
 first: all
 ####### Build rules
 
-$(TARGET): ui_form.h ui_mainwindow.h $(OBJECTS)  
+$(TARGET): ui_mainwindow.h $(OBJECTS)  
 	@test -d mips_simulator_gui.app/Contents/MacOS/ || mkdir -p mips_simulator_gui.app/Contents/MacOS/
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
@@ -680,9 +674,9 @@ distdir: FORCE
 	@test -d $(DISTDIR) || mkdir -p $(DISTDIR)
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../../../opt/anaconda3/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents form.h instruction.h mainwindow.h simu_functions.h simulator.h $(DISTDIR)/
-	$(COPY_FILE) --parents form.cpp instruction.cpp main.cpp mainwindow.cpp simu_functions.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents form.ui mainwindow.ui $(DISTDIR)/
+	$(COPY_FILE) --parents instruction.h mainwindow.h simu_functions.h simulator.h $(DISTDIR)/
+	$(COPY_FILE) --parents instruction.cpp main.cpp mainwindow.cpp simu_functions.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents mainwindow.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -714,114 +708,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: ../../../opt/anaconda3/mkspecs/features/data/dummy.cpp
 	/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++ -pipe -stdlib=libc++ -O2 -std=gnu++11 $(EXPORT_ARCH_ARGS) -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -mmacosx-version-min=10.10 -Wall -W -dM -E -o moc_predefs.h ../../../opt/anaconda3/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_form.cpp moc_mainwindow.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_form.cpp moc_mainwindow.cpp
-moc_form.cpp: ../../../opt/anaconda3/include/qt/QtWidgets/QWidget \
-		../../../opt/anaconda3/include/qt/QtWidgets/qwidget.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtwidgetsglobal.h \
-		../../../opt/anaconda3/include/qt/QtGui/qtguiglobal.h \
-		../../../opt/anaconda3/include/qt/QtCore/qglobal.h \
-		../../../opt/anaconda3/include/qt/QtCore/qconfig-bootstrapped.h \
-		../../../opt/anaconda3/include/qt/QtCore/qconfig.h \
-		../../../opt/anaconda3/include/qt/QtCore/qtcore-config.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsystemdetection.h \
-		../../../opt/anaconda3/include/qt/QtCore/qprocessordetection.h \
-		../../../opt/anaconda3/include/qt/QtCore/qcompilerdetection.h \
-		../../../opt/anaconda3/include/qt/QtCore/qtypeinfo.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsysinfo.h \
-		../../../opt/anaconda3/include/qt/QtCore/qlogging.h \
-		../../../opt/anaconda3/include/qt/QtCore/qflags.h \
-		../../../opt/anaconda3/include/qt/QtCore/qatomic.h \
-		../../../opt/anaconda3/include/qt/QtCore/qbasicatomic.h \
-		../../../opt/anaconda3/include/qt/QtCore/qatomic_bootstrap.h \
-		../../../opt/anaconda3/include/qt/QtCore/qgenericatomic.h \
-		../../../opt/anaconda3/include/qt/QtCore/qatomic_cxx11.h \
-		../../../opt/anaconda3/include/qt/QtCore/qatomic_msvc.h \
-		../../../opt/anaconda3/include/qt/QtCore/qglobalstatic.h \
-		../../../opt/anaconda3/include/qt/QtCore/qmutex.h \
-		../../../opt/anaconda3/include/qt/QtCore/qnumeric.h \
-		../../../opt/anaconda3/include/qt/QtCore/qversiontagging.h \
-		../../../opt/anaconda3/include/qt/QtGui/qtgui-config.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtwidgets-config.h \
-		../../../opt/anaconda3/include/qt/QtGui/qwindowdefs.h \
-		../../../opt/anaconda3/include/qt/QtCore/qobjectdefs.h \
-		../../../opt/anaconda3/include/qt/QtCore/qnamespace.h \
-		../../../opt/anaconda3/include/qt/QtCore/qobjectdefs_impl.h \
-		../../../opt/anaconda3/include/qt/QtGui/qwindowdefs_win.h \
-		../../../opt/anaconda3/include/qt/QtCore/qobject.h \
-		../../../opt/anaconda3/include/qt/QtCore/qstring.h \
-		../../../opt/anaconda3/include/qt/QtCore/qchar.h \
-		../../../opt/anaconda3/include/qt/QtCore/qbytearray.h \
-		../../../opt/anaconda3/include/qt/QtCore/qrefcount.h \
-		../../../opt/anaconda3/include/qt/QtCore/qarraydata.h \
-		../../../opt/anaconda3/include/qt/QtCore/qstringbuilder.h \
-		../../../opt/anaconda3/include/qt/QtCore/qlist.h \
-		../../../opt/anaconda3/include/qt/QtCore/qalgorithms.h \
-		../../../opt/anaconda3/include/qt/QtCore/qiterator.h \
-		../../../opt/anaconda3/include/qt/QtCore/qhashfunctions.h \
-		../../../opt/anaconda3/include/qt/QtCore/qpair.h \
-		../../../opt/anaconda3/include/qt/QtCore/qbytearraylist.h \
-		../../../opt/anaconda3/include/qt/QtCore/qstringlist.h \
-		../../../opt/anaconda3/include/qt/QtCore/qregexp.h \
-		../../../opt/anaconda3/include/qt/QtCore/qstringmatcher.h \
-		../../../opt/anaconda3/include/qt/QtCore/qcoreevent.h \
-		../../../opt/anaconda3/include/qt/QtCore/qscopedpointer.h \
-		../../../opt/anaconda3/include/qt/QtCore/qmetatype.h \
-		../../../opt/anaconda3/include/qt/QtCore/qvarlengtharray.h \
-		../../../opt/anaconda3/include/qt/QtCore/qcontainerfwd.h \
-		../../../opt/anaconda3/include/qt/QtCore/qobject_impl.h \
-		../../../opt/anaconda3/include/qt/QtCore/qmargins.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpaintdevice.h \
-		../../../opt/anaconda3/include/qt/QtCore/qrect.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsize.h \
-		../../../opt/anaconda3/include/qt/QtCore/qpoint.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpalette.h \
-		../../../opt/anaconda3/include/qt/QtGui/qcolor.h \
-		../../../opt/anaconda3/include/qt/QtGui/qrgb.h \
-		../../../opt/anaconda3/include/qt/QtGui/qrgba64.h \
-		../../../opt/anaconda3/include/qt/QtGui/qbrush.h \
-		../../../opt/anaconda3/include/qt/QtCore/qvector.h \
-		../../../opt/anaconda3/include/qt/QtGui/qmatrix.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpolygon.h \
-		../../../opt/anaconda3/include/qt/QtGui/qregion.h \
-		../../../opt/anaconda3/include/qt/QtCore/qdatastream.h \
-		../../../opt/anaconda3/include/qt/QtCore/qiodevice.h \
-		../../../opt/anaconda3/include/qt/QtCore/qline.h \
-		../../../opt/anaconda3/include/qt/QtGui/qtransform.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpainterpath.h \
-		../../../opt/anaconda3/include/qt/QtGui/qimage.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpixelformat.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpixmap.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsharedpointer.h \
-		../../../opt/anaconda3/include/qt/QtCore/qshareddata.h \
-		../../../opt/anaconda3/include/qt/QtCore/qhash.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsharedpointer_impl.h \
-		../../../opt/anaconda3/include/qt/QtGui/qfont.h \
-		../../../opt/anaconda3/include/qt/QtGui/qfontmetrics.h \
-		../../../opt/anaconda3/include/qt/QtGui/qfontinfo.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qsizepolicy.h \
-		../../../opt/anaconda3/include/qt/QtGui/qcursor.h \
-		../../../opt/anaconda3/include/qt/QtGui/qkeysequence.h \
-		../../../opt/anaconda3/include/qt/QtGui/qevent.h \
-		../../../opt/anaconda3/include/qt/QtCore/qvariant.h \
-		../../../opt/anaconda3/include/qt/QtCore/qmap.h \
-		../../../opt/anaconda3/include/qt/QtCore/qdebug.h \
-		../../../opt/anaconda3/include/qt/QtCore/qtextstream.h \
-		../../../opt/anaconda3/include/qt/QtCore/qlocale.h \
-		../../../opt/anaconda3/include/qt/QtCore/qset.h \
-		../../../opt/anaconda3/include/qt/QtCore/qcontiguouscache.h \
-		../../../opt/anaconda3/include/qt/QtCore/qurl.h \
-		../../../opt/anaconda3/include/qt/QtCore/qurlquery.h \
-		../../../opt/anaconda3/include/qt/QtCore/qfile.h \
-		../../../opt/anaconda3/include/qt/QtCore/qfiledevice.h \
-		../../../opt/anaconda3/include/qt/QtGui/qvector2d.h \
-		../../../opt/anaconda3/include/qt/QtGui/qtouchdevice.h \
-		form.h \
-		moc_predefs.h \
-		../../../opt/anaconda3/bin/moc
-	/Users/suzukijunpei/opt/anaconda3/bin/moc $(DEFINES) --include ./moc_predefs.h -I/Users/suzukijunpei/opt/anaconda3/mkspecs/macx-clang -I/Users/suzukijunpei/Desktop/Qt/mips_simulator_gui -I/Users/suzukijunpei/opt/anaconda3/include/qt -I/Users/suzukijunpei/opt/anaconda3/include/qt/QtWidgets -I/Users/suzukijunpei/opt/anaconda3/include/qt/QtGui -I/Users/suzukijunpei/opt/anaconda3/include/qt/QtCore -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include form.h -o moc_form.cpp
-
+	-$(DEL_FILE) moc_mainwindow.cpp
 moc_mainwindow.cpp: ../../../opt/anaconda3/include/qt/QtWidgets/QMainWindow \
 		../../../opt/anaconda3/include/qt/QtWidgets/qmainwindow.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qtwidgetsglobal.h \
@@ -925,8 +814,7 @@ moc_mainwindow.cpp: ../../../opt/anaconda3/include/qt/QtWidgets/QMainWindow \
 		../../../opt/anaconda3/include/qt/QtGui/qtouchdevice.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qtabwidget.h \
 		../../../opt/anaconda3/include/qt/QtGui/qicon.h \
-		form.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QWidget \
+		simulator.h \
 		mainwindow.h \
 		moc_predefs.h \
 		../../../opt/anaconda3/bin/moc
@@ -934,13 +822,9 @@ moc_mainwindow.cpp: ../../../opt/anaconda3/include/qt/QtWidgets/QMainWindow \
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_form.h ui_mainwindow.h
+compiler_uic_make_all: ui_mainwindow.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_form.h ui_mainwindow.h
-ui_form.h: form.ui \
-		../../../opt/anaconda3/bin/uic
-	/Users/suzukijunpei/opt/anaconda3/bin/uic form.ui -o ui_form.h
-
+	-$(DEL_FILE) ui_mainwindow.h
 ui_mainwindow.h: mainwindow.ui \
 		../../../opt/anaconda3/bin/uic
 	/Users/suzukijunpei/opt/anaconda3/bin/uic mainwindow.ui -o ui_mainwindow.h
@@ -956,139 +840,6 @@ compiler_lex_clean:
 compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_uic_clean 
 
 ####### Compile
-
-form.o: form.cpp form.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QWidget \
-		../../../opt/anaconda3/include/qt/QtWidgets/qwidget.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtwidgetsglobal.h \
-		../../../opt/anaconda3/include/qt/QtGui/qtguiglobal.h \
-		../../../opt/anaconda3/include/qt/QtCore/qglobal.h \
-		../../../opt/anaconda3/include/qt/QtCore/qconfig-bootstrapped.h \
-		../../../opt/anaconda3/include/qt/QtCore/qconfig.h \
-		../../../opt/anaconda3/include/qt/QtCore/qtcore-config.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsystemdetection.h \
-		../../../opt/anaconda3/include/qt/QtCore/qprocessordetection.h \
-		../../../opt/anaconda3/include/qt/QtCore/qcompilerdetection.h \
-		../../../opt/anaconda3/include/qt/QtCore/qtypeinfo.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsysinfo.h \
-		../../../opt/anaconda3/include/qt/QtCore/qlogging.h \
-		../../../opt/anaconda3/include/qt/QtCore/qflags.h \
-		../../../opt/anaconda3/include/qt/QtCore/qatomic.h \
-		../../../opt/anaconda3/include/qt/QtCore/qbasicatomic.h \
-		../../../opt/anaconda3/include/qt/QtCore/qatomic_bootstrap.h \
-		../../../opt/anaconda3/include/qt/QtCore/qgenericatomic.h \
-		../../../opt/anaconda3/include/qt/QtCore/qatomic_cxx11.h \
-		../../../opt/anaconda3/include/qt/QtCore/qatomic_msvc.h \
-		../../../opt/anaconda3/include/qt/QtCore/qglobalstatic.h \
-		../../../opt/anaconda3/include/qt/QtCore/qmutex.h \
-		../../../opt/anaconda3/include/qt/QtCore/qnumeric.h \
-		../../../opt/anaconda3/include/qt/QtCore/qversiontagging.h \
-		../../../opt/anaconda3/include/qt/QtGui/qtgui-config.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtwidgets-config.h \
-		../../../opt/anaconda3/include/qt/QtGui/qwindowdefs.h \
-		../../../opt/anaconda3/include/qt/QtCore/qobjectdefs.h \
-		../../../opt/anaconda3/include/qt/QtCore/qnamespace.h \
-		../../../opt/anaconda3/include/qt/QtCore/qobjectdefs_impl.h \
-		../../../opt/anaconda3/include/qt/QtGui/qwindowdefs_win.h \
-		../../../opt/anaconda3/include/qt/QtCore/qobject.h \
-		../../../opt/anaconda3/include/qt/QtCore/qstring.h \
-		../../../opt/anaconda3/include/qt/QtCore/qchar.h \
-		../../../opt/anaconda3/include/qt/QtCore/qbytearray.h \
-		../../../opt/anaconda3/include/qt/QtCore/qrefcount.h \
-		../../../opt/anaconda3/include/qt/QtCore/qarraydata.h \
-		../../../opt/anaconda3/include/qt/QtCore/qstringbuilder.h \
-		../../../opt/anaconda3/include/qt/QtCore/qlist.h \
-		../../../opt/anaconda3/include/qt/QtCore/qalgorithms.h \
-		../../../opt/anaconda3/include/qt/QtCore/qiterator.h \
-		../../../opt/anaconda3/include/qt/QtCore/qhashfunctions.h \
-		../../../opt/anaconda3/include/qt/QtCore/qpair.h \
-		../../../opt/anaconda3/include/qt/QtCore/qbytearraylist.h \
-		../../../opt/anaconda3/include/qt/QtCore/qstringlist.h \
-		../../../opt/anaconda3/include/qt/QtCore/qregexp.h \
-		../../../opt/anaconda3/include/qt/QtCore/qstringmatcher.h \
-		../../../opt/anaconda3/include/qt/QtCore/qcoreevent.h \
-		../../../opt/anaconda3/include/qt/QtCore/qscopedpointer.h \
-		../../../opt/anaconda3/include/qt/QtCore/qmetatype.h \
-		../../../opt/anaconda3/include/qt/QtCore/qvarlengtharray.h \
-		../../../opt/anaconda3/include/qt/QtCore/qcontainerfwd.h \
-		../../../opt/anaconda3/include/qt/QtCore/qobject_impl.h \
-		../../../opt/anaconda3/include/qt/QtCore/qmargins.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpaintdevice.h \
-		../../../opt/anaconda3/include/qt/QtCore/qrect.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsize.h \
-		../../../opt/anaconda3/include/qt/QtCore/qpoint.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpalette.h \
-		../../../opt/anaconda3/include/qt/QtGui/qcolor.h \
-		../../../opt/anaconda3/include/qt/QtGui/qrgb.h \
-		../../../opt/anaconda3/include/qt/QtGui/qrgba64.h \
-		../../../opt/anaconda3/include/qt/QtGui/qbrush.h \
-		../../../opt/anaconda3/include/qt/QtCore/qvector.h \
-		../../../opt/anaconda3/include/qt/QtGui/qmatrix.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpolygon.h \
-		../../../opt/anaconda3/include/qt/QtGui/qregion.h \
-		../../../opt/anaconda3/include/qt/QtCore/qdatastream.h \
-		../../../opt/anaconda3/include/qt/QtCore/qiodevice.h \
-		../../../opt/anaconda3/include/qt/QtCore/qline.h \
-		../../../opt/anaconda3/include/qt/QtGui/qtransform.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpainterpath.h \
-		../../../opt/anaconda3/include/qt/QtGui/qimage.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpixelformat.h \
-		../../../opt/anaconda3/include/qt/QtGui/qpixmap.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsharedpointer.h \
-		../../../opt/anaconda3/include/qt/QtCore/qshareddata.h \
-		../../../opt/anaconda3/include/qt/QtCore/qhash.h \
-		../../../opt/anaconda3/include/qt/QtCore/qsharedpointer_impl.h \
-		../../../opt/anaconda3/include/qt/QtGui/qfont.h \
-		../../../opt/anaconda3/include/qt/QtGui/qfontmetrics.h \
-		../../../opt/anaconda3/include/qt/QtGui/qfontinfo.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qsizepolicy.h \
-		../../../opt/anaconda3/include/qt/QtGui/qcursor.h \
-		../../../opt/anaconda3/include/qt/QtGui/qkeysequence.h \
-		../../../opt/anaconda3/include/qt/QtGui/qevent.h \
-		../../../opt/anaconda3/include/qt/QtCore/qvariant.h \
-		../../../opt/anaconda3/include/qt/QtCore/qmap.h \
-		../../../opt/anaconda3/include/qt/QtCore/qdebug.h \
-		../../../opt/anaconda3/include/qt/QtCore/qtextstream.h \
-		../../../opt/anaconda3/include/qt/QtCore/qlocale.h \
-		../../../opt/anaconda3/include/qt/QtCore/qset.h \
-		../../../opt/anaconda3/include/qt/QtCore/qcontiguouscache.h \
-		../../../opt/anaconda3/include/qt/QtCore/qurl.h \
-		../../../opt/anaconda3/include/qt/QtCore/qurlquery.h \
-		../../../opt/anaconda3/include/qt/QtCore/qfile.h \
-		../../../opt/anaconda3/include/qt/QtCore/qfiledevice.h \
-		../../../opt/anaconda3/include/qt/QtGui/qvector2d.h \
-		../../../opt/anaconda3/include/qt/QtGui/qtouchdevice.h \
-		ui_form.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QFileDialog \
-		../../../opt/anaconda3/include/qt/QtWidgets/qfiledialog.h \
-		../../../opt/anaconda3/include/qt/QtCore/qdir.h \
-		../../../opt/anaconda3/include/qt/QtCore/qfileinfo.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qdialog.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QMessageBox \
-		../../../opt/anaconda3/include/qt/QtWidgets/qmessagebox.h \
-		../../../opt/anaconda3/include/qt/QtCore/QTextStream \
-		../../../opt/anaconda3/include/qt/QtCore/QDebug \
-		../../../opt/anaconda3/include/qt/QtWidgets/QListWidgetItem \
-		../../../opt/anaconda3/include/qt/QtWidgets/qlistwidget.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qlistview.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qabstractitemview.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qabstractscrollarea.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qframe.h \
-		../../../opt/anaconda3/include/qt/QtCore/qabstractitemmodel.h \
-		../../../opt/anaconda3/include/qt/QtCore/qitemselectionmodel.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qabstractitemdelegate.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qstyleoption.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qabstractspinbox.h \
-		../../../opt/anaconda3/include/qt/QtGui/qvalidator.h \
-		../../../opt/anaconda3/include/qt/QtCore/qregularexpression.h \
-		../../../opt/anaconda3/include/qt/QtGui/qicon.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qslider.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qabstractslider.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qstyle.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtabbar.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtabwidget.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qrubberband.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o form.o form.cpp
 
 instruction.o: instruction.cpp instruction.h \
 		simulator.h \
@@ -1199,8 +950,7 @@ main.o: main.cpp mainwindow.h \
 		../../../opt/anaconda3/include/qt/QtGui/qtouchdevice.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qtabwidget.h \
 		../../../opt/anaconda3/include/qt/QtGui/qicon.h \
-		form.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QWidget \
+		simulator.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/QApplication \
 		../../../opt/anaconda3/include/qt/QtWidgets/qapplication.h \
 		../../../opt/anaconda3/include/qt/QtCore/qcoreapplication.h \
@@ -1314,12 +1064,29 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../opt/anaconda3/include/qt/QtGui/qtouchdevice.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qtabwidget.h \
 		../../../opt/anaconda3/include/qt/QtGui/qicon.h \
-		form.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QWidget \
+		simulator.h \
 		ui_mainwindow.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QTableWidget \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtablewidget.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qtableview.h \
+		../../../opt/anaconda3/include/qt/QtCore/QVariant \
+		../../../opt/anaconda3/include/qt/QtWidgets/QAction \
+		../../../opt/anaconda3/include/qt/QtWidgets/qaction.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qactiongroup.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QApplication \
+		../../../opt/anaconda3/include/qt/QtWidgets/qapplication.h \
+		../../../opt/anaconda3/include/qt/QtCore/qcoreapplication.h \
+		../../../opt/anaconda3/include/qt/QtCore/qeventloop.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qdesktopwidget.h \
+		../../../opt/anaconda3/include/qt/QtGui/qguiapplication.h \
+		../../../opt/anaconda3/include/qt/QtGui/qinputmethod.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QButtonGroup \
+		../../../opt/anaconda3/include/qt/QtWidgets/qbuttongroup.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QGridLayout \
+		../../../opt/anaconda3/include/qt/QtWidgets/qgridlayout.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qlayout.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qlayoutitem.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qboxlayout.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QHBoxLayout \
+		../../../opt/anaconda3/include/qt/QtWidgets/QHeaderView \
+		../../../opt/anaconda3/include/qt/QtWidgets/qheaderview.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qabstractitemview.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qabstractscrollarea.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qframe.h \
@@ -1335,6 +1102,26 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qstyle.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qtabbar.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qrubberband.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QListWidget \
+		../../../opt/anaconda3/include/qt/QtWidgets/qlistwidget.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qlistview.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QMenuBar \
+		../../../opt/anaconda3/include/qt/QtWidgets/qmenubar.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qmenu.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QPushButton \
+		../../../opt/anaconda3/include/qt/QtWidgets/qpushbutton.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qabstractbutton.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QSpacerItem \
+		../../../opt/anaconda3/include/qt/QtWidgets/QSpinBox \
+		../../../opt/anaconda3/include/qt/QtWidgets/qspinbox.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QStatusBar \
+		../../../opt/anaconda3/include/qt/QtWidgets/qstatusbar.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QTabWidget \
+		../../../opt/anaconda3/include/qt/QtWidgets/QTableWidget \
+		../../../opt/anaconda3/include/qt/QtWidgets/qtablewidget.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/qtableview.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QVBoxLayout \
+		../../../opt/anaconda3/include/qt/QtWidgets/QWidget \
 		../../../opt/anaconda3/include/qt/QtWidgets/QTableWidgetItem \
 		../../../opt/anaconda3/include/qt/QtWidgets/QFileDialog \
 		../../../opt/anaconda3/include/qt/QtWidgets/qfiledialog.h \
@@ -1346,9 +1133,7 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../opt/anaconda3/include/qt/QtCore/QTextStream \
 		../../../opt/anaconda3/include/qt/QtCore/QDebug \
 		../../../opt/anaconda3/include/qt/QtWidgets/QListWidgetItem \
-		../../../opt/anaconda3/include/qt/QtWidgets/qlistwidget.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qlistview.h \
-		simulator.h \
+		../../../opt/anaconda3/include/qt/QtCore/Qt \
 		simu_functions.h \
 		instruction.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o mainwindow.cpp
@@ -1356,9 +1141,6 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 simu_functions.o: simu_functions.cpp simu_functions.h \
 		simulator.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o simu_functions.o simu_functions.cpp
-
-moc_form.o: moc_form.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_form.o moc_form.cpp
 
 moc_mainwindow.o: moc_mainwindow.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
