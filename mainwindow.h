@@ -38,7 +38,7 @@ private slots:
 
     void on_pushButton_Restart_released();
 
-//    void on_pushButton_Back_released();
+    void on_pushButton_Back_released();
 
 private:
     Ui::MainWindow *ui;
@@ -62,6 +62,8 @@ private:
     void displayFile(QString file_name);
 
     void heigh_light_row(int row);
+
+    void back_simu(Small_simu* small_simu);
 };
 #endif // MAINWINDOW_H
 

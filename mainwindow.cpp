@@ -134,14 +134,26 @@ void MainWindow::update_register_table()
     ui->tableWidget_Registers->setItem(32, 1, item1);
 
     // now_node->prev
-    for(int i = 0; i < 32; i++) {
-        QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(l_lis.now_node->prev->registers[i], 16));
-        ui->tableWidget_Registers->setItem(i, 0, item);
+    if(l_lis.now_node == l_lis.boss) {
+        for(int i = 0; i < 32; i++) {
+            QTableWidgetItem *item = new QTableWidgetItem;
+            item->setText(QString::number(l_lis.now_node->registers[i], 16));
+            ui->tableWidget_Registers->setItem(i, 0, item);
+        }
+        QTableWidgetItem *item0 = new QTableWidgetItem;
+        item0->setText(QString::number(l_lis.now_node->pc, 16));
+        ui->tableWidget_Registers->setItem(32, 0, item0);
+    } else {
+        for(int i = 0; i < 32; i++) {
+            QTableWidgetItem *item = new QTableWidgetItem;
+            item->setText(QString::number(l_lis.now_node->prev->registers[i], 16));
+            ui->tableWidget_Registers->setItem(i, 0, item);
+        }
+        QTableWidgetItem *item0 = new QTableWidgetItem;
+        item0->setText(QString::number(l_lis.now_node->prev->pc, 16));
+        ui->tableWidget_Registers->setItem(32, 0, item0);
     }
-    QTableWidgetItem *item0 = new QTableWidgetItem;
-    item0->setText(QString::number(l_lis.now_node->prev->pc, 16));
-    ui->tableWidget_Registers->setItem(32, 0, item0);
+
 
     //now_node->next
     for(int i = 0; i < 32; i++) {
@@ -176,10 +188,18 @@ void MainWindow::update_memory_table()
     }
 
     // now_node->prev
-    for(int i = 0; i <= l_lis.stack_size; i++) {
-        QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(l_lis.now_node->prev->stack[i], 16));
-        ui->tableWidget_Memory->setItem(i, 0, item);
+    if(l_lis.now_node == l_lis.boss) {
+        for(int i = 0; i <= l_lis.stack_size; i++) {
+            QTableWidgetItem *item = new QTableWidgetItem;
+            item->setText(QString::number(l_lis.now_node->stack[i], 16));
+            ui->tableWidget_Memory->setItem(i, 0, item);
+        }
+    } else {
+        for(int i = 0; i <= l_lis.stack_size; i++) {
+            QTableWidgetItem *item = new QTableWidgetItem;
+            item->setText(QString::number(l_lis.now_node->prev->stack[i], 16));
+            ui->tableWidget_Memory->setItem(i, 0, item);
+        }
     }
 
     //now_node->next
@@ -222,6 +242,19 @@ void MainWindow::heigh_light_row(int row)
 {
     ui->listWidget_Code->setCurrentRow(row);
     ui->listWidget_Code->scrollToItem(ui->listWidget_Code->currentItem());
+}
+
+void MainWindow::back_simu(Small_simu *small_simu)
+{
+    simu->pc = small_simu->pc;
+
+    for (int i = 0; i < 32; i++) {
+        simu->registers[i] = small_simu->registers[i];
+    }
+
+    for(int i = 0; i <= l_lis.stack_size; i++) {
+        simu->memory[l_lis.ini_sp + i] = small_simu->stack[i];
+    }
 }
 
 
@@ -332,40 +365,24 @@ void MainWindow::on_pushButton_Restart_released()
     InitialTableDisplay();
 }
 
-//void MainWindow::on_pushButton_Back_released()
-//{
-//    int loop_num = 0;
-//    while(loop_num < next_step) {
-//        uint32_t opcode = get_opcode(simu);
-//        uint32_t funct = get_func(simu);
+void MainWindow::on_pushButton_Back_released()
+{
+    int loop_num = 0;
+    while(loop_num < next_step) {
 
-//        if(opcode == 0b111111) return;
+        if(l_lis.now_node == l_lis.boss) {
+            return ;
+        } else {
+            l_lis.now_node = l_lis.now_node->prev;
+        }
 
-//        if (instructions[opcode][funct] == NULL) {
-//            printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-//            exit(1);
-//        }
+        back_simu(l_lis.now_node);
 
-//        instructions[opcode][funct](simu);
-//        form->heigh_light_row(simu->pc / 4);
+        heigh_light_row(simu->pc / 4);
 
-//        if(l_lis.now_node->next == l_lis.boss) {
-//            l_lis.create_new(simu);
-//            l_lis.siz++;
-//            if(l_lis.siz > l_lis.mx_siz) {
-//                l_lis.boss->next = l_lis.boss->next->next;
-//                free(l_lis.boss->next->prev->stack);
-//                free(l_lis.boss->next->prev);
-//                l_lis.boss->next->prev = l_lis.boss;
-//                l_lis.siz--;
-//            }
-//        } else {
-//            l_lis.now_node = l_lis.now_node->next;
-//        }
+        update_register_table();
+        update_memory_table();
 
-//        update_register_table();
-//        update_memory_table();
-
-//        loop_num++;
-//    }
-//}
+        loop_num++;
+    }
+}
