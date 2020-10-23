@@ -45,10 +45,12 @@ public:
     int siz;
     int mx_siz = 10000;
     int ini_sp = 4096;
+    int stack_size = 1024;
 
     Small_simu *create_initial() {
         Small_simu* small_simu = (Small_simu*)malloc(sizeof(Small_simu));
-        small_simu->stack = (uint8_t*)malloc(ini_sp);
+        small_simu->stack = (uint8_t*)malloc(ini_sp + 1);
+        memset(small_simu->stack, 0, sizeof(uint8_t) * stack_size);
 
         memset(small_simu->registers, 0, sizeof(small_simu->registers));
 
@@ -61,7 +63,6 @@ public:
     }
 
     void create_new(Simulator *simu) {
-        cout << "1" << endl;
         Small_simu* new_simu = create_initial();
 
         new_simu->prev = boss->prev;
@@ -76,8 +77,8 @@ public:
 
         new_simu->pc = simu->pc;
 
-        for(int i = 0; i <= ini_sp; i++) {
-            new_simu->stack[ini_sp - i] = simu->memory[ini_sp - i];
+        for(int i = 0; i <= stack_size; i++) {
+            new_simu->stack[i] = simu->memory[ini_sp + i];
         }
     }
 
@@ -99,10 +100,6 @@ public:
         boss->next = boss;
         boss->prev = boss;
         siz = 0;
-//        boss->next = boss;
-//        boss->prev = boss;
-//        now_node = boss;
-//        siz = 0;
     }
 
     Simu_linked_list() {

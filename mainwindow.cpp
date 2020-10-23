@@ -58,16 +58,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     simu = create_simu(MEMORY_SIZE, 0, 0);
 
-    for(int i = 0; i < 5; i++) {
-        simu_ary[i] = create_simu(MEMORY_SIZE, 0, 0);
+    for(int i = 0; i < 33; i++) {
+        ui->tableWidget_Registers->setRowHeight(i, 28);
     }
 
     for(int i = 0; i < 33; i++) {
-        ui->tableWidget_Registers->setRowHeight(i, 29);
-    }
-
-    for(int i = 0; i < 33; i++) {
-        ui->tableWidget_Memory->setRowHeight(i, 29);
+        ui->tableWidget_Memory->setRowHeight(i, 28);
     }
 }
 
@@ -106,12 +102,12 @@ void MainWindow::InitialTableDisplay()
 
     ui->tableWidget_Registers->setAlternatingRowColors(true);
 
-    ui->tableWidget_Memory->setRowCount(l_lis.ini_sp);
+    ui->tableWidget_Memory->setRowCount(l_lis.stack_size + 1);
     ui->tableWidget_Memory->setColumnCount(3);
 
     QStringList vlabels2;
-    for(int i = 0; i <= l_lis.ini_sp; i++) {
-        vlabels << QString::number(i);
+    for(int i = 0; i <= l_lis.stack_size; i++) {
+        vlabels2 << QString::number(l_lis.ini_sp + i);
     }
     ui->tableWidget_Memory->setVerticalHeaderLabels(vlabels2);
 
@@ -126,7 +122,6 @@ void MainWindow::InitialTableDisplay()
             ui->tableWidget_Memory->setItem(i, j, item);
         }
     }
-    ui->tableWidget_Memory->scrollToBottom();
 
     ui->tableWidget_Memory->setAlternatingRowColors(true);
 
@@ -134,16 +129,6 @@ void MainWindow::InitialTableDisplay()
 
 void MainWindow::update_register_table()
 {
-//    for(int i = 0; i < 5; i++) {
-//        for (int j = 0; j < 32; j++) {
-//            QTableWidgetItem *item = new QTableWidgetItem;
-//            item->setText(QString::number(simu_ary[i]->registers[j], 16));
-//            ui->tableWidget_Registers->setItem(j, i, item);
-//        }
-//        QTableWidgetItem *item = new QTableWidgetItem;
-//        item->setText(QString::number(simu_ary[i]->pc, 16));
-//        ui->tableWidget_Registers->setItem(32, i, item);
-//    }
     // now_node
     for(int i = 0; i < 32; i++) {
         QTableWidgetItem *item = new QTableWidgetItem;
@@ -187,22 +172,38 @@ void MainWindow::update_register_table()
     }
 }
 
-void MainWindow::shift_simu_ary_next()
+void MainWindow::update_memory_table()
 {
-    for (int i = 0; i < 2; i++) {
-        simu_ary[i]->pc = simu_ary[i + 1]->pc;
-        for (int j = 0; j < 32; j++) {
-            simu_ary[i]->registers[j] = simu_ary[i + 1]->registers[j];
-        }
-
-        //　メモリはいったんコピらない
+    // now_node
+    for(int i = 0; i <= l_lis.stack_size; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(l_lis.now_node->stack[i], 16));
+        ui->tableWidget_Memory->setItem(i, 1, item);
     }
 
-    simu_ary[2]->pc = simu->pc;
-    for (int j = 0; j < 32; j++) {
-        simu_ary[2]->registers[j] = simu->registers[j];
+    // now_node->prev
+    for(int i = 0; i <= l_lis.stack_size; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(l_lis.now_node->prev->stack[i], 16));
+        ui->tableWidget_Memory->setItem(i, 0, item);
+    }
+
+    //now_node->next
+    for(int i = 0; i <= l_lis.stack_size; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(l_lis.now_node->next->stack[i], 16));
+        ui->tableWidget_Memory->setItem(i, 2, item);
+    }
+
+
+    for(int i = 0; i <= l_lis.stack_size; i++) {
+        if(ui->tableWidget_Memory->item(i, 0)->text() != ui->tableWidget_Memory->item(i, 1)->text()) {
+            ui->tableWidget_Memory->item(i, 0)->setBackground(Qt::red);
+            ui->tableWidget_Memory->item(i, 1)->setBackground(Qt::green);
+        }
     }
 }
+
 
 void MainWindow::on_pushButton_Open_released()
 {
@@ -246,19 +247,11 @@ void MainWindow::on_pushButton_Next_released()
             exit(1);
         }
 
-        cout << "fff" << endl;
-
-
         instructions[opcode][funct](simu);
-        // shift_simu_ary_next();
         form->heigh_light_row(simu->pc / 4);
 
-        cout << "eee" << endl;
-
         if(l_lis.now_node->next == l_lis.boss) {
-            cout << "ddd" << endl;
             l_lis.create_new(simu);
-            cout << "hello" <<endl;
             l_lis.siz++;
             if(l_lis.siz > l_lis.mx_siz) {
                 l_lis.boss->next = l_lis.boss->next->next;
@@ -272,6 +265,7 @@ void MainWindow::on_pushButton_Next_released()
         }
 
         update_register_table();
+        update_memory_table();
 
         loop_num++;
     }
@@ -313,11 +307,45 @@ void MainWindow::on_pushButton_Restart_released()
     }
     file.close();
 
-    for (int i = 0; i < 5; i++) {
-        simu_ary[i] = create_simu(MEMORY_SIZE, 0, 0);
-    }
-
     l_lis.delete_whole_l();
 
     InitialTableDisplay();
+}
+
+void MainWindow::on_pushButton_Back_released()
+{
+    int loop_num = 0;
+    while(loop_num < next_step) {
+        uint32_t opcode = get_opcode(simu);
+        uint32_t funct = get_func(simu);
+
+        if(opcode == 0b111111) return;
+
+        if (instructions[opcode][funct] == NULL) {
+            printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+            exit(1);
+        }
+
+        instructions[opcode][funct](simu);
+        form->heigh_light_row(simu->pc / 4);
+
+        if(l_lis.now_node->next == l_lis.boss) {
+            l_lis.create_new(simu);
+            l_lis.siz++;
+            if(l_lis.siz > l_lis.mx_siz) {
+                l_lis.boss->next = l_lis.boss->next->next;
+                free(l_lis.boss->next->prev->stack);
+                free(l_lis.boss->next->prev);
+                l_lis.boss->next->prev = l_lis.boss;
+                l_lis.siz--;
+            }
+        } else {
+            l_lis.now_node = l_lis.now_node->next;
+        }
+
+        update_register_table();
+        update_memory_table();
+
+        loop_num++;
+    }
 }

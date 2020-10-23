@@ -1,19 +1,19 @@
 #include "simu_functions.h"
 
 uint32_t ret_32bit(Simulator* simu, uint32_t from) {
-    uint8_t eight_bit0 = simu->memory[from + 3];
-    uint8_t eight_bit1 = simu->memory[from + 2];
-    uint8_t eight_bit2 = simu->memory[from + 1];
-    uint8_t eight_bit3 = simu->memory[from];
+    uint8_t eight_bit0 = simu->memory[from];
+    uint8_t eight_bit1 = simu->memory[from + 1];
+    uint8_t eight_bit2 = simu->memory[from + 2];
+    uint8_t eight_bit3 = simu->memory[from + 3];
     uint32_t inst = (uint32_t)((eight_bit0 << 24) | (eight_bit1 << 16) | (eight_bit2 << 8) | (eight_bit3));
     return inst;
 }
 
 void divide_8bits_store(Simulator* simu, uint32_t from, uint32_t num) {
-    simu->memory[from - 3] = (uint8_t)(num >> 24);
-    simu->memory[from - 2] = (uint8_t)((num >> 16) & (0b11111111));
-    simu->memory[from - 1] = (uint8_t)((num >> 8) & (0b11111111));
-    simu->memory[from] = (uint8_t)(num & (0b11111111));
+    simu->memory[from] = (uint8_t)(num >> 24);
+    simu->memory[from + 1] = (uint8_t)((num >> 16) & (0b11111111));
+    simu->memory[from + 2] = (uint8_t)((num >> 8) & (0b11111111));
+    simu->memory[from + 3] = (uint8_t)(num & (0b11111111));
 }
 
 uint32_t ret_inst_32bit(Simulator* simu) {

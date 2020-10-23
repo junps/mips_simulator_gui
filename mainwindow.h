@@ -41,6 +41,8 @@ private slots:
 
     void on_pushButton_Restart_released();
 
+    void on_pushButton_Back_released();
+
 private:
     Ui::MainWindow *ui;
     Form *form;
@@ -49,13 +51,13 @@ private:
 
     void update_register_table();
 
+    void update_memory_table();
+
     void shift_simu_ary_next();
 
     int next_step = 1;
 
     QString file_name;
-
-    Simulator* simu_ary[5];
 
     Simulator* simu;
 
