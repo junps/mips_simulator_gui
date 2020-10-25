@@ -20,31 +20,10 @@
       <item>
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QTabWidget" name="tabWidget">
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="tab">
-           <attribute name="title">
-            <string>Registers</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout">
-            <item row="0" column="0">
-             <widget class="QTableWidget" name="tableWidget_Registers"/>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="tab_2">
-           <attribute name="title">
-            <string>Memory</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="0" column="0">
-             <widget class="QTableWidget" name="tableWidget_Memory"/>
-            </item>
-           </layout>
-          </widget>
-         </widget>
+         <widget class="QTableWidget" name="tableWidget_Registers"/>
+        </item>
+        <item>
+         <widget class="QTableWidget" name="tableWidget_Memory"/>
         </item>
         <item>
          <widget class="QListWidget" name="listWidget_Code"/>
