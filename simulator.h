@@ -102,6 +102,19 @@ public:
         siz = 0;
     }
 
+    void change_simu(Simulator* simu) {
+        for(int i = 0; i < 32; i++) {
+            simu->registers[i] = now_node->registers[i];
+        }
+
+        simu->pc = now_node->pc;
+
+        for(int i = 0; i <= stack_size; i++) {
+            simu->memory[ini_sp + i] = now_node->stack[i];
+        }
+
+    }
+
     Simu_linked_list() {
         boss = create_initial();
         now_node = boss;

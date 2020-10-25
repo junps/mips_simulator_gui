@@ -57,11 +57,11 @@ MainWindow::MainWindow(QWidget *parent)
     simu = create_simu(MEMORY_SIZE, 0, 0);
 
     for(int i = 0; i < 33; i++) {
-        ui->tableWidget_Registers->setRowHeight(i, 28);
+        ui->tableWidget_Registers->setRowHeight(i, 27);
     }
 
     for(int i = 0; i < 33; i++) {
-        ui->tableWidget_Memory->setRowHeight(i, 28);
+        ui->tableWidget_Memory->setRowHeight(i, 27);
     }
 }
 
@@ -315,6 +315,7 @@ void MainWindow::on_pushButton_Next_released()
             }
         } else {
             l_lis.now_node = l_lis.now_node->next;
+            l_lis.change_simu(simu);
         }
 
         update_register_table();
