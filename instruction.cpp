@@ -57,7 +57,7 @@ static void bne(Simulator* simu) {
     uint32_t rt = get_rt(simu);
     int32_t imm = get_imm(simu);
     if(simu->registers[rs] != simu->registers[rt]) {
-        simu->pc += (imm << 2);
+        simu->pc += (imm << 2) + 4;
     } else {
         simu->pc += 4;
     }
