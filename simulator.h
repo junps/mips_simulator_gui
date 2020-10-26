@@ -22,7 +22,8 @@ enum Register { ZERO, AT, V0, V1, A0, A1, A2, A3, T0, T1, T2, T3, T4, T5, T6, T7
 typedef struct {
     int32_t registers[REGISTER_NUM];
 
-    uint8_t* memory;
+    uint8_t* text_field;
+    uint8_t* stack_field;
 
     uint32_t pc; //program counter
 } Simulator;
@@ -44,12 +45,12 @@ public:
     Small_simu *now_node;
     int siz;
     int mx_siz = 10000;
-    int ini_sp = 4096;
+    int ini_sp = 0;
     int stack_size = 1024;
 
     Small_simu *create_initial() {
         Small_simu* small_simu = (Small_simu*)malloc(sizeof(Small_simu));
-        small_simu->stack = (uint8_t*)malloc(ini_sp + 1);
+        small_simu->stack = (uint8_t*)malloc(stack_size + 1);
         memset(small_simu->stack, 0, sizeof(uint8_t) * stack_size);
 
         memset(small_simu->registers, 0, sizeof(small_simu->registers));
@@ -78,7 +79,7 @@ public:
         new_simu->pc = simu->pc;
 
         for(int i = 0; i <= stack_size; i++) {
-            new_simu->stack[i] = simu->memory[ini_sp + i];
+            new_simu->stack[i] = simu->stack_field[ini_sp + i];
         }
     }
 
@@ -110,7 +111,7 @@ public:
         simu->pc = now_node->pc;
 
         for(int i = 0; i <= stack_size; i++) {
-            simu->memory[ini_sp + i] = now_node->stack[i];
+            simu->stack_field[ini_sp + i] = now_node->stack[i];
         }
 
     }

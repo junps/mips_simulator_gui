@@ -16,6 +16,7 @@ using namespace std;
 #include "instruction.h"
 
 #define MEMORY_SIZE (2000000000)
+#define STACK_SIZE (1024 * 2)
 
 #define _NOW 2
 #define _PRE 1
@@ -27,11 +28,14 @@ string registers_name[] = { "ZERO", "AT", "V0", "V1", "A0", "A1", "A2", "A3", "T
                             "T2", "T3", "T4", "T5", "T6", "T7", "S0", "S1", "S2", "S3", "S4",
                             "S5", "S6", "S7", "T8", "T9", "K0", "K1", "GP", "SP", "FP", "RA" };
 
-Simulator* create_simu(size_t size, uint32_t pc, uint32_t sp) {
+Simulator* create_simu(size_t text_size, size_t stack_size, uint32_t pc, uint32_t sp) {
     Simulator* simu = (Simulator*)malloc(sizeof(Simulator));
-    simu->memory = (uint8_t*)malloc(size);
+    simu->text_field = (uint8_t*)malloc(text_size);
+    simu->stack_field = (uint8_t*)malloc(stack_size);
 
     memset(simu->registers, 0, sizeof(simu->registers));
+    memset(simu->text_field, 0, text_size);
+    memset(simu->stack_field, 0, stack_size);
 
     simu->pc = pc;
     simu->registers[SP] = sp;
@@ -41,7 +45,8 @@ Simulator* create_simu(size_t size, uint32_t pc, uint32_t sp) {
 }
 
 void destroy_simu(Simulator* simu) {
-    free(simu->memory);
+    free(simu->text_field);
+    free(simu->stack_field);
     free(simu);
 }
 
@@ -54,7 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     init_instructions();
 
-    simu = create_simu(MEMORY_SIZE, 0, 0);
+    simu = create_simu(MEMORY_SIZE, STACK_SIZE, 0, 0);
 
     for(int i = 0; i < 33; i++) {
         ui->tableWidget_Registers->setRowHeight(i, 27);
@@ -109,7 +114,7 @@ void MainWindow::InitialTableDisplay()
     hlabels2 << "pre" << "now" << "next";
     ui->tableWidget_Memory->setHorizontalHeaderLabels(hlabels2);
 
-    for(int i = 0; i <= l_lis.ini_sp; i++) {
+    for(int i = 0; i <= l_lis.stack_size; i++) {
         for (int j = 0; j < 3; j++) {
             QTableWidgetItem *item = new QTableWidgetItem;
             item->setText(QString::number(0, 16));
@@ -253,7 +258,7 @@ void MainWindow::back_simu(Small_simu *small_simu)
     }
 
     for(int i = 0; i <= l_lis.stack_size; i++) {
-        simu->memory[l_lis.ini_sp + i] = small_simu->stack[i];
+        simu->stack_field[l_lis.ini_sp + i] = small_simu->stack[i];
     }
 }
 
@@ -276,10 +281,10 @@ void MainWindow::on_pushButton_Open_released()
     while(!input_text.isNull()) {
         buf = input_text.toUtf8().data();
         uint32_t num = (uint32_t)strtol(buf, NULL, 2);
-        simu->memory[cnt] = (uint8_t)(num >> 24);
-        simu->memory[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->memory[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->memory[cnt + 3] = (uint8_t)(num & (0b11111111));
+        simu->text_field[cnt] = (uint8_t)(num >> 24);
+        simu->text_field[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->text_field[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->text_field[cnt + 3] = (uint8_t)(num & (0b11111111));
         input_text = in.readLine(256);
         cnt += 4;
     }
@@ -346,16 +351,17 @@ void MainWindow::on_pushButton_Restart_released()
     buf = (char *)calloc(1024, sizeof(char));
 
     memset(simu->registers, 0, sizeof(simu->registers));
-    memset(simu->memory, 0, sizeof(uint8_t) * MEMORY_SIZE);
+    memset(simu->text_field, 0, sizeof(uint8_t) * MEMORY_SIZE);
+    memset(simu->stack_field, 0, sizeof(uint8_t) * STACK_SIZE);
     simu->pc = 0;
 
     while(!input_text.isNull()) {
         buf = input_text.toUtf8().data();
         uint32_t num = (uint32_t)strtol(buf, NULL, 2);
-        simu->memory[cnt] = (uint8_t)(num >> 24);
-        simu->memory[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->memory[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->memory[cnt + 3] = (uint8_t)(num & (0b11111111));
+        simu->text_field[cnt] = (uint8_t)(num >> 24);
+        simu->text_field[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->text_field[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->text_field[cnt + 3] = (uint8_t)(num & (0b11111111));
         input_text = in.readLine(256);
         cnt += 4;
     }
