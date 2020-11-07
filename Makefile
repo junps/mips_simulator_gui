@@ -35,7 +35,7 @@ MOVE          = mv -f
 TAR           = tar -cf
 COMPRESS      = gzip -9f
 DISTNAME      = mips_simulator_gui1.0.0
-DISTDIR = /Users/suzukijunpei/Desktop/Qt/mips_simulator_gui/.tmp/mips_simulator_gui1.0.0
+DISTDIR = /Users/suzukijunpei/Desktop/Qt/mips_simulator_gui_main/.tmp/mips_simulator_gui1.0.0
 LINK          = /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang++
 LFLAGS        = -stdlib=libc++ -headerpad_max_install_names $(EXPORT_ARCH_ARGS) -Wl,-syslibroot,/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -mmacosx-version-min=10.10 -Wl,-rpath,@executable_path/Frameworks -Wl,-rpath,/Users/suzukijunpei/opt/anaconda3/lib
 LIBS          = $(SUBLIBS) -L/Users/suzukijunpei/opt/anaconda3/lib -lQt5Widgets -framework DiskArbitration -framework IOKit -lQt5Gui -lQt5Core -framework OpenGL -framework AGL 
@@ -818,7 +818,7 @@ moc_mainwindow.cpp: ../../../opt/anaconda3/include/qt/QtWidgets/QMainWindow \
 		mainwindow.h \
 		moc_predefs.h \
 		../../../opt/anaconda3/bin/moc
-	/Users/suzukijunpei/opt/anaconda3/bin/moc $(DEFINES) --include ./moc_predefs.h -I/Users/suzukijunpei/opt/anaconda3/mkspecs/macx-clang -I/Users/suzukijunpei/Desktop/Qt/mips_simulator_gui -I/Users/suzukijunpei/opt/anaconda3/include/qt -I/Users/suzukijunpei/opt/anaconda3/include/qt/QtWidgets -I/Users/suzukijunpei/opt/anaconda3/include/qt/QtGui -I/Users/suzukijunpei/opt/anaconda3/include/qt/QtCore -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include mainwindow.h -o moc_mainwindow.cpp
+	/Users/suzukijunpei/opt/anaconda3/bin/moc $(DEFINES) --include ./moc_predefs.h -I/Users/suzukijunpei/opt/anaconda3/mkspecs/macx-clang -I/Users/suzukijunpei/Desktop/Qt/mips_simulator_gui_main -I/Users/suzukijunpei/opt/anaconda3/include/qt -I/Users/suzukijunpei/opt/anaconda3/include/qt/QtWidgets -I/Users/suzukijunpei/opt/anaconda3/include/qt/QtGui -I/Users/suzukijunpei/opt/anaconda3/include/qt/QtCore -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include/c++/v1 -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/clang/12.0.0/include -I/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk/usr/include -I/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include mainwindow.h -o moc_mainwindow.cpp
 
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
@@ -841,7 +841,68 @@ compiler_clean: compiler_moc_predefs_clean compiler_moc_header_clean compiler_ui
 
 ####### Compile
 
-instruction.o: instruction.cpp instruction.h \
+instruction.o: instruction.cpp ../../../opt/anaconda3/include/qt/QtCore/QDebug \
+		../../../opt/anaconda3/include/qt/QtCore/qdebug.h \
+		../../../opt/anaconda3/include/qt/QtCore/qalgorithms.h \
+		../../../opt/anaconda3/include/qt/QtCore/qglobal.h \
+		../../../opt/anaconda3/include/qt/QtCore/qconfig-bootstrapped.h \
+		../../../opt/anaconda3/include/qt/QtCore/qconfig.h \
+		../../../opt/anaconda3/include/qt/QtCore/qtcore-config.h \
+		../../../opt/anaconda3/include/qt/QtCore/qsystemdetection.h \
+		../../../opt/anaconda3/include/qt/QtCore/qprocessordetection.h \
+		../../../opt/anaconda3/include/qt/QtCore/qcompilerdetection.h \
+		../../../opt/anaconda3/include/qt/QtCore/qtypeinfo.h \
+		../../../opt/anaconda3/include/qt/QtCore/qsysinfo.h \
+		../../../opt/anaconda3/include/qt/QtCore/qlogging.h \
+		../../../opt/anaconda3/include/qt/QtCore/qflags.h \
+		../../../opt/anaconda3/include/qt/QtCore/qatomic.h \
+		../../../opt/anaconda3/include/qt/QtCore/qbasicatomic.h \
+		../../../opt/anaconda3/include/qt/QtCore/qatomic_bootstrap.h \
+		../../../opt/anaconda3/include/qt/QtCore/qgenericatomic.h \
+		../../../opt/anaconda3/include/qt/QtCore/qatomic_cxx11.h \
+		../../../opt/anaconda3/include/qt/QtCore/qatomic_msvc.h \
+		../../../opt/anaconda3/include/qt/QtCore/qglobalstatic.h \
+		../../../opt/anaconda3/include/qt/QtCore/qmutex.h \
+		../../../opt/anaconda3/include/qt/QtCore/qnumeric.h \
+		../../../opt/anaconda3/include/qt/QtCore/qversiontagging.h \
+		../../../opt/anaconda3/include/qt/QtCore/qhash.h \
+		../../../opt/anaconda3/include/qt/QtCore/qchar.h \
+		../../../opt/anaconda3/include/qt/QtCore/qiterator.h \
+		../../../opt/anaconda3/include/qt/QtCore/qlist.h \
+		../../../opt/anaconda3/include/qt/QtCore/qrefcount.h \
+		../../../opt/anaconda3/include/qt/QtCore/qarraydata.h \
+		../../../opt/anaconda3/include/qt/QtCore/qhashfunctions.h \
+		../../../opt/anaconda3/include/qt/QtCore/qpair.h \
+		../../../opt/anaconda3/include/qt/QtCore/qbytearraylist.h \
+		../../../opt/anaconda3/include/qt/QtCore/qbytearray.h \
+		../../../opt/anaconda3/include/qt/QtCore/qnamespace.h \
+		../../../opt/anaconda3/include/qt/QtCore/qstring.h \
+		../../../opt/anaconda3/include/qt/QtCore/qstringbuilder.h \
+		../../../opt/anaconda3/include/qt/QtCore/qstringlist.h \
+		../../../opt/anaconda3/include/qt/QtCore/qregexp.h \
+		../../../opt/anaconda3/include/qt/QtCore/qstringmatcher.h \
+		../../../opt/anaconda3/include/qt/QtCore/qmap.h \
+		../../../opt/anaconda3/include/qt/QtCore/qtextstream.h \
+		../../../opt/anaconda3/include/qt/QtCore/qiodevice.h \
+		../../../opt/anaconda3/include/qt/QtCore/qobject.h \
+		../../../opt/anaconda3/include/qt/QtCore/qobjectdefs.h \
+		../../../opt/anaconda3/include/qt/QtCore/qobjectdefs_impl.h \
+		../../../opt/anaconda3/include/qt/QtCore/qcoreevent.h \
+		../../../opt/anaconda3/include/qt/QtCore/qscopedpointer.h \
+		../../../opt/anaconda3/include/qt/QtCore/qmetatype.h \
+		../../../opt/anaconda3/include/qt/QtCore/qvarlengtharray.h \
+		../../../opt/anaconda3/include/qt/QtCore/qcontainerfwd.h \
+		../../../opt/anaconda3/include/qt/QtCore/qobject_impl.h \
+		../../../opt/anaconda3/include/qt/QtCore/qlocale.h \
+		../../../opt/anaconda3/include/qt/QtCore/qvariant.h \
+		../../../opt/anaconda3/include/qt/QtCore/qshareddata.h \
+		../../../opt/anaconda3/include/qt/QtCore/qvector.h \
+		../../../opt/anaconda3/include/qt/QtCore/qpoint.h \
+		../../../opt/anaconda3/include/qt/QtCore/qset.h \
+		../../../opt/anaconda3/include/qt/QtCore/qcontiguouscache.h \
+		../../../opt/anaconda3/include/qt/QtCore/qsharedpointer.h \
+		../../../opt/anaconda3/include/qt/QtCore/qsharedpointer_impl.h \
+		instruction.h \
 		simulator.h \
 		simu_functions.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o instruction.o instruction.cpp
@@ -1079,12 +1140,11 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../opt/anaconda3/include/qt/QtGui/qinputmethod.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/QButtonGroup \
 		../../../opt/anaconda3/include/qt/QtWidgets/qbuttongroup.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QGridLayout \
-		../../../opt/anaconda3/include/qt/QtWidgets/qgridlayout.h \
+		../../../opt/anaconda3/include/qt/QtWidgets/QHBoxLayout \
+		../../../opt/anaconda3/include/qt/QtWidgets/qboxlayout.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qlayout.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qlayoutitem.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/qboxlayout.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QHBoxLayout \
+		../../../opt/anaconda3/include/qt/QtWidgets/qgridlayout.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/QHeaderView \
 		../../../opt/anaconda3/include/qt/QtWidgets/qheaderview.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qabstractitemview.h \
@@ -1116,7 +1176,6 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qspinbox.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/QStatusBar \
 		../../../opt/anaconda3/include/qt/QtWidgets/qstatusbar.h \
-		../../../opt/anaconda3/include/qt/QtWidgets/QTabWidget \
 		../../../opt/anaconda3/include/qt/QtWidgets/QTableWidget \
 		../../../opt/anaconda3/include/qt/QtWidgets/qtablewidget.h \
 		../../../opt/anaconda3/include/qt/QtWidgets/qtableview.h \

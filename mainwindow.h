@@ -40,6 +40,8 @@ private slots:
 
     void on_pushButton_Back_released();
 
+    void on_pushButton_All_released();
+
 private:
     Ui::MainWindow *ui;
 
@@ -64,6 +66,10 @@ private:
     void heigh_light_row(int row);
 
     void back_simu(Small_simu* small_simu);
+
+    void display_last_register(Simulator* simu);
+
+    void display_last_stacks(Simulator* simu);
 };
 #endif // MAINWINDOW_H
 

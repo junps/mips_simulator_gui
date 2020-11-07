@@ -16,7 +16,7 @@ using namespace std;
 #include "instruction.h"
 
 #define MEMORY_SIZE (2000000000)
-#define STACK_SIZE (1024 * 2)
+#define STACK_SIZE (1024 * 1024)
 
 #define _NOW 2
 #define _PRE 1
@@ -172,12 +172,12 @@ void MainWindow::update_register_table()
 
 
     for(int i = 0; i < 32; i++) {
-        if(ui->tableWidget_Registers->item(i, 0)->text() != ui->tableWidget_Registers->item(i, 1)->text()) {
+        if(l_lis.now_node->prev->registers[i] != l_lis.now_node->registers[i]) {
             ui->tableWidget_Registers->item(i, 0)->setBackground(Qt::red);
             ui->tableWidget_Registers->item(i, 1)->setBackground(Qt::green);
         }
     }
-    if(ui->tableWidget_Registers->item(32, 0)->text() != ui->tableWidget_Registers->item(32, 1)->text()) {
+    if(l_lis.now_node->prev->pc != l_lis.now_node->pc) {
         ui->tableWidget_Registers->item(32, 0)->setBackground(Qt::red);
         ui->tableWidget_Registers->item(32, 1)->setBackground(Qt::green);
     }
@@ -216,7 +216,7 @@ void MainWindow::update_memory_table()
 
 
     for(int i = 0; i <= l_lis.stack_size; i++) {
-        if(ui->tableWidget_Memory->item(i, 0)->text() != ui->tableWidget_Memory->item(i, 1)->text()) {
+        if(l_lis.now_node->prev->stack[i] != l_lis.now_node->stack[i]) {
             ui->tableWidget_Memory->item(i, 0)->setBackground(Qt::red);
             ui->tableWidget_Memory->item(i, 1)->setBackground(Qt::green);
         }
@@ -262,6 +262,29 @@ void MainWindow::back_simu(Small_simu *small_simu)
     }
 }
 
+void MainWindow::display_last_register(Simulator *simu)
+{
+    // now_node
+    for(int i = 0; i < 32; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(simu->registers[i], 16));
+        ui->tableWidget_Registers->setItem(i, 1, item);
+    }
+    QTableWidgetItem *item1 = new QTableWidgetItem;
+    item1->setText(QString::number(simu->pc, 16));
+    ui->tableWidget_Registers->setItem(32, 1, item1);
+}
+
+void MainWindow::display_last_stacks(Simulator *simu)
+{
+    // now_node
+    for(int i = 0; i <= l_lis.stack_size; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(simu->stack_field[i], 16));
+        ui->tableWidget_Memory->setItem(i, 1, item);
+    }
+}
+
 
 void MainWindow::on_pushButton_Open_released()
 {
@@ -291,6 +314,7 @@ void MainWindow::on_pushButton_Open_released()
     file.close();
 }
 
+
 void MainWindow::on_pushButton_Next_released()
 {
     int loop_num = 0;
@@ -298,15 +322,17 @@ void MainWindow::on_pushButton_Next_released()
         uint32_t opcode = get_opcode(simu);
         uint32_t funct = get_func(simu);
 
-        if(opcode == 0b111111) return;
+//        printf("opcode : %d, funct : %d\n", opcode, funct);
+
+        if(opcode == 0b111111) break;
 
         if (instructions[opcode][funct] == NULL) {
             printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+            printf("pc is %d\n", simu->pc / 4);
             exit(1);
         }
 
         instructions[opcode][funct](simu);
-        heigh_light_row(simu->pc / 4);
 
         if(l_lis.now_node->next == l_lis.boss) {
             l_lis.create_new(simu);
@@ -323,11 +349,11 @@ void MainWindow::on_pushButton_Next_released()
             l_lis.change_simu(simu);
         }
 
-        update_register_table();
-        update_memory_table();
-
         loop_num++;
     }
+    heigh_light_row(simu->pc / 4);
+    update_register_table();
+    update_memory_table();
 
 }
 
@@ -392,4 +418,27 @@ void MainWindow::on_pushButton_Back_released()
 
         loop_num++;
     }
+}
+
+void MainWindow::on_pushButton_All_released()
+{
+    while(1) {
+        uint32_t opcode = get_opcode(simu);
+        uint32_t funct = get_func(simu);
+
+//        printf("opcode : %d, funct : %d\n", opcode, funct);
+
+        if(opcode == 0b111111) break;
+
+        if (instructions[opcode][funct] == NULL) {
+            printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+            printf("pc is %d\n", simu->pc / 4);
+            exit(1);
+        }
+
+        instructions[opcode][funct](simu);
+    }
+    heigh_light_row(simu->pc / 4);
+    display_last_register(simu);
+    display_last_stacks(simu);
 }
