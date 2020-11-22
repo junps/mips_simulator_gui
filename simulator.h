@@ -19,8 +19,13 @@ using namespace std;
 enum Register { ZERO, AT, V0, V1, A0, A1, A2, A3, T0, T1, T2, T3, T4, T5, T6, T7,
                 S0, S1, S2, S3, S4, S5, S6, S7, T8, T9, K0, K1, GP, SP, FP, RA };
 
+enum Register_f {F0, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11,
+                 F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22,
+                 F23, F24, F25, F26, F27, F28, F29, F30, F31};
+
 typedef struct {
     int32_t registers[REGISTER_NUM];
+    float registers_f[REGISTER_NUM];
 
     uint8_t* text_field;
     uint8_t* stack_field;

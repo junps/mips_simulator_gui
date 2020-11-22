@@ -67,3 +67,8 @@ uint32_t get_address(Simulator* simu) {
     uint32_t inst = ret_inst_32bit(simu);
     return ((inst) & (0x3ffffff));
 }
+
+uint32_t get_fmt(Simulator* simu) {
+    uint32_t inst = ret_inst_32bit(simu);
+    return (((inst >> 24) & 3) << 1) | ((inst >> 16) & 1);
+}

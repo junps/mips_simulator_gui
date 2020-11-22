@@ -27,4 +27,6 @@ int32_t get_imm(Simulator* simu);
 
 uint32_t get_address(Simulator* simu);
 
+uint32_t get_fmt(Simulator* simu);
+
 #endif // SIMU_FUNCTIONS_H

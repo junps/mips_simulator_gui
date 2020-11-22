@@ -18,15 +18,13 @@ using namespace std;
 #define MEMORY_SIZE (2000000000)
 #define STACK_SIZE (1024 * 1024)
 
-#define _NOW 2
-#define _PRE 1
-#define _PREPRE 0
-#define _NEXT 3
-#define _NEXTNEXT 4
-
 string registers_name[] = { "ZERO", "AT", "V0", "V1", "A0", "A1", "A2", "A3", "T0", "T1",
                             "T2", "T3", "T4", "T5", "T6", "T7", "S0", "S1", "S2", "S3", "S4",
                             "S5", "S6", "S7", "T8", "T9", "K0", "K1", "GP", "SP", "FP", "RA" };
+
+string registers_name_f[] = {"F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11",
+                             "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22",
+                             "F23", "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31"};
 
 Simulator* create_simu(size_t text_size, size_t stack_size, uint32_t pc, uint32_t sp) {
     Simulator* simu = (Simulator*)malloc(sizeof(Simulator));
@@ -321,6 +319,7 @@ void MainWindow::on_pushButton_Next_released()
     while(loop_num < next_step) {
         uint32_t opcode = get_opcode(simu);
         uint32_t funct = get_func(simu);
+        uint32_t fmt = get_fmt(simu);
 
 //        printf("opcode : %d, funct : %d\n", opcode, funct);
 
@@ -332,7 +331,7 @@ void MainWindow::on_pushButton_Next_released()
             exit(1);
         }
 
-        instructions[opcode][funct](simu);
+        instructions[opcode][funct][fmt](simu);
 
         if(l_lis.now_node->next == l_lis.boss) {
             l_lis.create_new(simu);
@@ -425,20 +424,20 @@ void MainWindow::on_pushButton_All_released()
     while(1) {
         uint32_t opcode = get_opcode(simu);
         uint32_t funct = get_func(simu);
+        uint32_t fmt = get_fmt(simu);
 
 //        printf("opcode : %d, funct : %d\n", opcode, funct);
 
         if(opcode == 0b111111) break;
 
-        if (instructions[opcode][funct] == NULL) {
+        if (instructions[opcode][funct][fmt] == NULL) {
             printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
             printf("pc is %d\n", simu->pc / 4);
             exit(1);
         }
 
-        instructions[opcode][funct](simu);
+        instructions[opcode][funct][fmt](simu);
     }
     heigh_light_row(simu->pc / 4);
     display_last_register(simu);
-    display_last_stacks(simu);
 }

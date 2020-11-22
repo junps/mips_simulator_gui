@@ -8,7 +8,7 @@
 #include "simulator.h"
 #include "simu_functions.h"
 
-instruction_func_t* instructions[64][64];
+instruction_func_t* instructions[64][64][8];
 
 void add(Simulator* simu) {
     uint32_t rs = get_rs(simu);
@@ -125,30 +125,43 @@ static void jal(Simulator* simu) {
     simu->pc = (simu->pc & 0xf0000000) | (addr << 2);
 }
 
-static void set_inst(uint32_t opcode, uint32_t funct, int unique, instruction_func_t* inst) {
+static void set_inst(uint32_t opcode, uint32_t funct, uint32_t fmt, int unique, instruction_func_t* inst) {
     if(unique == 1) {
-        for(int i = 0; i < 64; i++) instructions[opcode][i] = inst;
+        for(int i = 0; i < 64; i++) {
+            for (int j = 0; j < 8; j++) {
+                instructions[opcode][i][j] = inst;
+            }
+        }
+    } else if(unique == 0){
+        for (int i = 0; i < 8; i++) {
+            instructions[opcode][funct][i] = inst;
+        }
+    } else if (unique == 2){
+        for (int i = 0; i < 64; i++) {
+            instructions[opcode][i][fmt] = inst;
+        }
     } else {
-        instructions[opcode][funct] = inst;
+        instructions[opcode][funct][fmt] = inst;
     }
 }
 
 void init_instructions(void) {
     memset(instructions, 0, sizeof(instructions));
     uint32_t dummybit = 0b000000;
+    uint32_t dmfmt = 0b000;
 
-    set_inst(0b000000, 0b100000, 0, &add);
-    set_inst(0b001000, dummybit, 1, &addi);
-    set_inst(0b100011, dummybit, 1, &lw);
-    set_inst(0b001111, dummybit, 1, &lui);
-    set_inst(0b000000, 0b100101, 0, &or_f);
-    set_inst(0b001101, dummybit, 1, &ori);
-    set_inst(0b101011, dummybit, 1, &sw);
-    set_inst(0b000000, 0b101010, 0, &slt);
-    set_inst(0b001010, dummybit, 1, &slti);
-    set_inst(0b000101, dummybit, 1, &bne);
-    set_inst(0b000100, dummybit, 1, &beq);
-    set_inst(0b000010, dummybit, 1, &j);
-    set_inst(0b000000, 0b001000, 0, &jr);
-    set_inst(0b000011, dummybit, 1, &jal);
+    set_inst(0b000000, 0b100000, dmfmt, 0, &add);
+    set_inst(0b001000, dummybit, dmfmt, 1, &addi);
+    set_inst(0b100011, dummybit, dmfmt, 1, &lw);
+    set_inst(0b001111, dummybit, dmfmt, 1, &lui);
+    set_inst(0b000000, 0b100101, dmfmt, 0, &or_f);
+    set_inst(0b001101, dummybit, dmfmt, 1, &ori);
+    set_inst(0b101011, dummybit, dmfmt, 1, &sw);
+    set_inst(0b000000, 0b101010, dmfmt, 0, &slt);
+    set_inst(0b001010, dummybit, dmfmt, 1, &slti);
+    set_inst(0b000101, dummybit, dmfmt, 1, &bne);
+    set_inst(0b000100, dummybit, dmfmt, 1, &beq);
+    set_inst(0b000010, dummybit, dmfmt, 1, &j);
+    set_inst(0b000000, 0b001000, dmfmt, 0, &jr);
+    set_inst(0b000011, dummybit, dmfmt, 1, &jal);
 }
