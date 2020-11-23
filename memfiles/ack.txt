@@ -1,0 +1,45 @@
+	.globl _min_caml_start
+ack.15:
+	li	$t8, 0
+	slt	$t9, $t8, $v0
+	bne	$t9, $zero, ble_else.34
+	addi	$v0, $v1, 1
+	jr	$ra
+ble_else.34:
+	li	$t8, 0
+	slt	$t9, $t8, $v1
+	bne	$t9, $zero, ble_else.35
+	addi	$v0, $v0, -1
+	li	$v1, 1
+	j	ack.15
+ble_else.35:
+	addi	$a0, $v0, -1
+	addi	$v1, $v1, -1
+	sw	$a0, 0($sp)
+	move	$t8, $ra
+	sw	$t8, 4($sp)
+	addi	$sp, $sp, 8
+	jal	ack.15
+	addi	$sp, $sp, -8
+	lw	$t8, 4($sp)
+	move	$v1, $v0
+	move	$ra, $t8
+	lw	$v0, 0($sp)
+	j	ack.15
+_min_caml_start:
+	addi	$sp, $zero, 0
+	li	$v0, 3
+	li	$v1, 2
+	move	$t8, $ra
+	sw	$t8, 4($sp)
+	addi	$sp, $sp, 8
+	jal	ack.15
+	addi	$sp, $sp, -8
+	lw	$t8, 4($sp)
+	move	$ra, $t8
+	move	$t8, $ra
+	sw	$t8, 4($sp)
+	addi	$sp, $sp, 8
+	addi	$sp, $sp, -8
+	lw	$t8, 4($sp)
+	move	$ra, $t8

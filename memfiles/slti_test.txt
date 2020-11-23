@@ -1,0 +1,49 @@
+	.globl _min_caml_start
+fib.10:
+    sub  $t8, $zero, $v0
+    slti $t9, $t8, -1
+	bne	$t9, $zero, ble_else.24
+	jr	$ra
+ble_else.24:
+	addi	$v1, $v0, -1
+	sw	$v0, 0($sp)
+	move	$t8, $ra
+	move	$v0, $v1
+	sw	$t8, 4($sp)
+	addi	$sp, $sp, 8
+	jal	fib.10
+	addi	$sp, $sp, -8
+	lw	$t8, 4($sp)
+	move	$ra, $t8
+	lw	$v1, 0($sp)
+	addi	$v1, $v1, -2
+	sw	$v0, 4($sp)
+	move	$t8, $ra
+	move	$v0, $v1
+	sw	$t8, 12($sp)
+	addi	$sp, $sp, 16
+	jal	fib.10
+	addi	$sp, $sp, -16
+	lw	$t8, 12($sp)
+	move	$ra, $t8
+	lw	$v1, 4($sp)
+	add	$v0, $v1, $v0
+	jr	$ra
+_min_caml_start:
+	addi	$sp, $zero, 0
+	in  $v0
+    out $v0
+	move	$t8, $ra
+	sw	$t8, 4($sp)
+	addi	$sp, $sp, 8
+	jal	fib.10
+	addi	$sp, $sp, -8
+	lw	$t8, 4($sp)
+	move	$ra, $t8
+	move	$t8, $ra
+	sw	$t8, 4($sp)
+	addi	$sp, $sp, 8
+	addi	$sp, $sp, -8
+	lw	$t8, 4($sp)
+	move	$ra, $t8
+    out $v0

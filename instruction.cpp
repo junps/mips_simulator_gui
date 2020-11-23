@@ -26,6 +26,14 @@ void addi(Simulator* simu) {
     simu->pc += 4;
 }
 
+void sub(Simulator* simu) {
+    uint32_t rs = get_rs(simu);
+    uint32_t rt = get_rt(simu);
+    uint32_t rd = get_rd(simu);
+    simu->registers[rd] = simu->registers[rs] - simu->registers[rt];
+    simu->pc += 4;
+}
+
 static void lw(Simulator* simu) {
     uint32_t rs = get_rs(simu);
     uint32_t rt = get_rt(simu);
@@ -51,11 +59,27 @@ static void or_f(Simulator* simu) {
     simu->pc += 4;
 }
 
+static void and_f(Simulator* simu) {
+    uint32_t rs = get_rs(simu);
+    uint32_t rt = get_rt(simu);
+    uint32_t rd = get_rd(simu);
+    simu->registers[rd] = (simu->registers[rt]) & (simu->registers[rs]);
+    simu->pc += 4;
+}
+
 static void ori(Simulator* simu) {
     uint32_t rs = get_rs(simu);
     uint32_t rt = get_rt(simu);
     int32_t imm = get_imm(simu);
     simu->registers[rt] = imm | (simu->registers[rs]);
+    simu->pc += 4;
+}
+
+static void andi(Simulator* simu) {
+    uint32_t rs = get_rs(simu);
+    uint32_t rt = get_rt(simu);
+    int32_t imm = get_imm(simu);
+    simu->registers[rt] = imm & (simu->registers[rs]);
     simu->pc += 4;
 }
 
@@ -84,6 +108,22 @@ static void slti(Simulator* simu) {
     int new_num = 0;
     if(simu->registers[rs] < imm) new_num = 1;
     simu->registers[rt] = new_num;
+    simu->pc += 4;
+}
+
+static void sll(Simulator* simu) {
+    uint32_t rt = get_rt(simu);
+    uint32_t rd = get_rd(simu);
+    int32_t imm = get_imm(simu);
+    simu->registers[rd] = simu->registers[rt] << ((imm >> 6) & 0b11111);
+    simu->pc += 4;
+}
+
+static void srl(Simulator* simu) {
+    uint32_t rt = get_rt(simu);
+    uint32_t rd = get_rd(simu);
+    int32_t imm = get_imm(simu);
+    simu->registers[rd] = simu->registers[rt] >> ((imm >> 6) & 0b11111);
     simu->pc += 4;
 }
 
@@ -125,6 +165,25 @@ static void jal(Simulator* simu) {
     simu->pc = (simu->pc & 0xf0000000) | (addr << 2);
 }
 
+static void in_f(Simulator* simu) {
+    uint32_t rt = get_rt(simu);
+    simu->registers[rt] = ((simu->registers[rt] >> 8) << 8) | 0b1010;
+    simu->pc += 4;
+}
+
+static void out_f(Simulator* simu) {
+    uint32_t rt = get_rt(simu);
+    FILE *fp;
+    if((fp = fopen("out_put.txt", "a")) == NULL) {
+        printf("error");
+        exit(1);
+    }
+    char buf = rt & 0xff;
+    fwrite(&buf, 1, sizeof(char), fp);
+    fclose(fp);
+    simu->pc += 4;
+}
+
 static void set_inst(uint32_t opcode, uint32_t funct, uint32_t fmt, int unique, instruction_func_t* inst) {
     if(unique == 1) {
         for(int i = 0; i < 64; i++) {
@@ -151,17 +210,24 @@ void init_instructions(void) {
     uint32_t dmfmt = 0b000;
 
     set_inst(0b000000, 0b100000, dmfmt, 0, &add);
+    set_inst(0b000000, 0b100010, dmfmt, 0, &sub);
     set_inst(0b001000, dummybit, dmfmt, 1, &addi);
     set_inst(0b100011, dummybit, dmfmt, 1, &lw);
     set_inst(0b001111, dummybit, dmfmt, 1, &lui);
     set_inst(0b000000, 0b100101, dmfmt, 0, &or_f);
+    set_inst(0b000000, 0b100100, dmfmt, 0, &and_f);
     set_inst(0b001101, dummybit, dmfmt, 1, &ori);
+    set_inst(0b001100, dummybit, dmfmt, 1, &andi);
     set_inst(0b101011, dummybit, dmfmt, 1, &sw);
     set_inst(0b000000, 0b101010, dmfmt, 0, &slt);
     set_inst(0b001010, dummybit, dmfmt, 1, &slti);
+    set_inst(0b000000, 0b000000, dmfmt, 0, &sll);
+    set_inst(0b000000, 0b000010, dmfmt, 0, &srl);
     set_inst(0b000101, dummybit, dmfmt, 1, &bne);
     set_inst(0b000100, dummybit, dmfmt, 1, &beq);
     set_inst(0b000010, dummybit, dmfmt, 1, &j);
     set_inst(0b000000, 0b001000, dmfmt, 0, &jr);
     set_inst(0b000011, dummybit, dmfmt, 1, &jal);
+    set_inst(0b011010, dummybit, dmfmt, 1, &in_f);
+    set_inst(0b011011, dummybit, dmfmt, 1, &out_f);
 }
