@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include "ui_mainwindow.h"
 
 #include <QTableWidget>
@@ -32,6 +32,8 @@ Simulator* create_simu(size_t text_size, size_t stack_size, uint32_t pc, uint32_
     simu->stack_field = (uint8_t*)malloc(stack_size);
 
     memset(simu->registers, 0, sizeof(simu->registers));
+    memset(simu->registers_f, 0, sizeof(simu->registers));
+    memset(simu->condition_code, 0, sizeof(simu->condition_code));
     memset(simu->text_field, 0, text_size);
     memset(simu->stack_field, 0, stack_size);
 
@@ -59,11 +61,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     simu = create_simu(MEMORY_SIZE, STACK_SIZE, 0, 0);
 
-    for(int i = 0; i < 33; i++) {
+    for(int i = 0; i < 32 + 32 + 1 + 8; i++) {
         ui->tableWidget_Registers->setRowHeight(i, 27);
     }
-
-    for(int i = 0; i < 33; i++) {
+    for(int i = 0; i < l_lis.stack_size; i++) {
         ui->tableWidget_Memory->setRowHeight(i, 27);
     }
 }
@@ -76,20 +77,27 @@ MainWindow::~MainWindow()
 
 void MainWindow::InitialTableDisplay()
 {
-    ui->tableWidget_Registers->setRowCount(33);
+    ui->tableWidget_Registers->setRowCount(73);
     ui->tableWidget_Registers->setColumnCount(3);
 
     QStringList vlabels;
     vlabels << "ZERO" << "AT" << "V0" << "V1" << "A0" << "A1" << "A2" << "A3" << "T0" << "T1"
             << "T2" << "T3" << "T4" << "T5" << "T6" << "T7" << "S0" << "S1" << "S2" << "S3"
-            << "S4" << "S5" << "S6" << "S7" << "T8" << "T9" << "K0" << "K1" << "GP" << "SP" << "FP" << "RA" << "N_pc";
+            << "S4" << "S5" << "S6" << "S7" << "T8" << "T9" << "K0" << "K1" << "GP" << "SP" << "FP" << "RA";
+
+    vlabels << "F0" << "F1" << "F2" << "F3" << "F4" << "F5" << "F6" << "F7" << "F8" << "F9" << "F10" << "F11"
+            << "F12" << "F13" << "F14" << "F15" << "F16" << "F17" << "F18" << "F19" << "F20" << "F21" << "F22"
+            << "F23" << "F24" << "F25" << "F26" << "F27" << "F28" << "F29" << "F30" << "F31" << "N_pc";
+
+    vlabels << "C0" << "C1" << "C2" << "C3" << "C4" << "C5" << "C6" << "C7";
+
     ui->tableWidget_Registers->setVerticalHeaderLabels(vlabels);
 
     QStringList hlabels;
     hlabels << "pre" << "now" << "next";
     ui->tableWidget_Registers->setHorizontalHeaderLabels(hlabels);
 
-    for(int i = 0; i < 33; i++) {
+    for(int i = 0; i < 73; i++) {
         for (int j = 0; j < 3; j++) {
             QTableWidgetItem *item = new QTableWidgetItem;
             item->setText(QString::number(0, 16));
@@ -132,9 +140,24 @@ void MainWindow::update_register_table()
         item->setText(QString::number(l_lis.now_node->registers[i], 16));
         ui->tableWidget_Registers->setItem(i, 1, item);
     }
+
+    for(int j = 0; j < 32; j++) {
+        union { float f; int i; } f_and_i;
+        f_and_i.f = l_lis.now_node->registers_f[j];
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(f_and_i.i, 16));
+        ui->tableWidget_Registers->setItem(j + 32, 1, item);
+    }
+
     QTableWidgetItem *item1 = new QTableWidgetItem;
     item1->setText(QString::number(l_lis.now_node->pc, 16));
-    ui->tableWidget_Registers->setItem(32, 1, item1);
+    ui->tableWidget_Registers->setItem(64, 1, item1);
+
+    for(int i = 0; i < 8; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(l_lis.now_node->condition_code[i], 16));
+        ui->tableWidget_Registers->setItem(i + 65, 1, item);
+    }
 
     // now_node->prev
     if(l_lis.now_node == l_lis.boss) {
@@ -143,18 +166,48 @@ void MainWindow::update_register_table()
             item->setText(QString::number(l_lis.now_node->registers[i], 16));
             ui->tableWidget_Registers->setItem(i, 0, item);
         }
+
+        for(int j = 0; j < 32; j++) {
+            union { float f; int i; } f_and_i;
+            f_and_i.f = l_lis.now_node->registers_f[j];
+            QTableWidgetItem *item = new QTableWidgetItem;
+            item->setText(QString::number(f_and_i.i, 16));
+            ui->tableWidget_Registers->setItem(j + 32, 0, item);
+        }
+
         QTableWidgetItem *item0 = new QTableWidgetItem;
         item0->setText(QString::number(l_lis.now_node->pc, 16));
-        ui->tableWidget_Registers->setItem(32, 0, item0);
+        ui->tableWidget_Registers->setItem(64, 0, item0);
+
+        for(int i = 0; i < 8; i++) {
+            QTableWidgetItem *item = new QTableWidgetItem;
+            item->setText(QString::number(l_lis.now_node->condition_code[i], 16));
+            ui->tableWidget_Registers->setItem(i + 65, 0, item);
+        }
     } else {
         for(int i = 0; i < 32; i++) {
             QTableWidgetItem *item = new QTableWidgetItem;
             item->setText(QString::number(l_lis.now_node->prev->registers[i], 16));
             ui->tableWidget_Registers->setItem(i, 0, item);
         }
+
+        for(int j = 0; j < 32; j++) {
+            union { float f; int i; } f_and_i;
+            f_and_i.f = l_lis.now_node->prev->registers_f[j];
+            QTableWidgetItem *item = new QTableWidgetItem;
+            item->setText(QString::number(f_and_i.i, 16));
+            ui->tableWidget_Registers->setItem(j + 32, 0, item);
+        }
+
         QTableWidgetItem *item0 = new QTableWidgetItem;
         item0->setText(QString::number(l_lis.now_node->prev->pc, 16));
-        ui->tableWidget_Registers->setItem(32, 0, item0);
+        ui->tableWidget_Registers->setItem(64, 0, item0);
+
+        for(int i = 0; i < 8; i++) {
+            QTableWidgetItem *item = new QTableWidgetItem;
+            item->setText(QString::number(l_lis.now_node->prev->condition_code[i], 16));
+            ui->tableWidget_Registers->setItem(i + 65, 0, item);
+        }
     }
 
 
@@ -164,10 +217,24 @@ void MainWindow::update_register_table()
         item->setText(QString::number(l_lis.now_node->next->registers[i], 16));
         ui->tableWidget_Registers->setItem(i, 2, item);
     }
+
+    for(int j = 0; j < 32; j++) {
+        union { float f; int i; } f_and_i;
+        f_and_i.f = l_lis.now_node->next->registers_f[j];
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(f_and_i.i, 16));
+        ui->tableWidget_Registers->setItem(j + 32, 2, item);
+    }
+
     QTableWidgetItem *item2 = new QTableWidgetItem;
     item2->setText(QString::number(l_lis.now_node->next->pc, 16));
-    ui->tableWidget_Registers->setItem(32, 2, item2);
+    ui->tableWidget_Registers->setItem(64, 2, item2);
 
+    for(int i = 0; i < 8; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(l_lis.now_node->next->condition_code[i], 16));
+        ui->tableWidget_Registers->setItem(i + 65, 2, item);
+    }
 
     for(int i = 0; i < 32; i++) {
         if(l_lis.now_node->prev->registers[i] != l_lis.now_node->registers[i]) {
@@ -175,9 +242,24 @@ void MainWindow::update_register_table()
             ui->tableWidget_Registers->item(i, 1)->setBackground(Qt::green);
         }
     }
+
+    for(int i = 0; i < 32; i++) {
+        if(l_lis.now_node->prev->registers_f[i] != l_lis.now_node->registers_f[i]) {
+            ui->tableWidget_Registers->item(i + 32, 0)->setBackground(Qt::red);
+            ui->tableWidget_Registers->item(i + 32, 1)->setBackground(Qt::green);
+        }
+    }
+
     if(l_lis.now_node->prev->pc != l_lis.now_node->pc) {
-        ui->tableWidget_Registers->item(32, 0)->setBackground(Qt::red);
-        ui->tableWidget_Registers->item(32, 1)->setBackground(Qt::green);
+        ui->tableWidget_Registers->item(64, 0)->setBackground(Qt::red);
+        ui->tableWidget_Registers->item(64, 1)->setBackground(Qt::green);
+    }
+
+    for(int i = 0; i < 8; i++) {
+        if(l_lis.now_node->prev->condition_code[i] != l_lis.now_node->condition_code[i]) {
+            ui->tableWidget_Registers->item(i + 65, 0)->setBackground(Qt::red);
+            ui->tableWidget_Registers->item(i + 65, 1)->setBackground(Qt::green);
+        }
     }
 }
 
@@ -255,6 +337,14 @@ void MainWindow::back_simu(Small_simu *small_simu)
         simu->registers[i] = small_simu->registers[i];
     }
 
+    for (int i = 0; i < 32; i++) {
+        simu->registers_f[i] = small_simu->registers_f[i];
+    }
+
+    for (int i = 0; i < 8; i++) {
+        simu->condition_code[i] = small_simu->condition_code[i];
+    }
+
     for(int i = 0; i <= l_lis.stack_size; i++) {
         simu->stack_field[l_lis.ini_sp + i] = small_simu->stack[i];
     }
@@ -268,9 +358,23 @@ void MainWindow::display_last_register(Simulator *simu)
         item->setText(QString::number(simu->registers[i], 16));
         ui->tableWidget_Registers->setItem(i, 1, item);
     }
+
+    for(int j = 0; j < 32; j++) {
+        union { float f; int i; } f_and_i;
+        f_and_i.f = simu->registers_f[j];
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(f_and_i.i, 16));
+        ui->tableWidget_Registers->setItem(j + 32, 1, item);
+    }
     QTableWidgetItem *item1 = new QTableWidgetItem;
     item1->setText(QString::number(simu->pc, 16));
-    ui->tableWidget_Registers->setItem(32, 1, item1);
+    ui->tableWidget_Registers->setItem(64, 1, item1);
+
+    for(int i = 0; i < 8; i++) {
+        QTableWidgetItem *item = new QTableWidgetItem;
+        item->setText(QString::number(simu->condition_code[i], 16));
+        ui->tableWidget_Registers->setItem(i + 65, 1, item);
+    }
 }
 
 void MainWindow::display_last_stacks(Simulator *simu)
@@ -325,7 +429,7 @@ void MainWindow::on_pushButton_Next_released()
 
         if(opcode == 0b111111) break;
 
-        if (instructions[opcode][funct] == NULL) {
+        if (instructions[opcode][funct][fmt] == NULL) {
             printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
             printf("pc is %d\n", simu->pc / 4);
             exit(1);
@@ -353,7 +457,6 @@ void MainWindow::on_pushButton_Next_released()
     heigh_light_row(simu->pc / 4);
     update_register_table();
     update_memory_table();
-
 }
 
 void MainWindow::on_spinBox_valueChanged(int arg1)
@@ -365,6 +468,13 @@ void MainWindow::on_pushButton_Restart_released()
 {
     heigh_light_row(0);
 
+    memset(simu->registers, 0, sizeof(simu->registers));
+    memset(simu->registers_f, 0, sizeof(simu->registers_f));
+    memset(simu->condition_code, 0, sizeof(simu->condition_code));
+    memset(simu->text_field, 0, sizeof(uint8_t) * MEMORY_SIZE);
+    memset(simu->stack_field, 0, sizeof(uint8_t) * STACK_SIZE);
+    simu->pc = 0;
+
     QFile file(file_name);
     if(!file.open(QFile::ReadOnly | QFile::Text)) {
         QMessageBox::warning(this,"title","cannot open the file");
@@ -374,11 +484,6 @@ void MainWindow::on_pushButton_Restart_released()
     int cnt = 0;
     char *buf;
     buf = (char *)calloc(1024, sizeof(char));
-
-    memset(simu->registers, 0, sizeof(simu->registers));
-    memset(simu->text_field, 0, sizeof(uint8_t) * MEMORY_SIZE);
-    memset(simu->stack_field, 0, sizeof(uint8_t) * STACK_SIZE);
-    simu->pc = 0;
 
     while(!input_text.isNull()) {
         buf = input_text.toUtf8().data();
@@ -392,9 +497,33 @@ void MainWindow::on_pushButton_Restart_released()
     }
     file.close();
 
+    QFile file_d(data_file);
+    if(!file_d.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"title","cannot open the file");
+    }
+    QTextStream in_d(&file_d);
+    QString input_text_d = in_d.readLine();
+    int cnt_d = 0;
+    char *buf_d;
+    buf_d = (char *)calloc(1024, sizeof(char));
+
+    while(!input_text_d.isNull()) {
+        buf_d = input_text_d.toUtf8().data();
+        uint32_t num = (uint32_t)strtol(buf_d, NULL, 2);
+        simu->stack_field[cnt_d] = (uint8_t)(num >> 24);
+        simu->stack_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->stack_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->stack_field[cnt_d + 3] = (uint8_t)(num & (0b11111111));
+        input_text_d = in_d.readLine(256);
+        cnt_d += 4;
+    }
+    file_d.close();
+
     l_lis.delete_whole_l();
 
     InitialTableDisplay();
+
+    display_last_stacks(simu);
 }
 
 void MainWindow::on_pushButton_Back_released()
@@ -443,4 +572,32 @@ void MainWindow::on_pushButton_All_released()
     }
     heigh_light_row(simu->pc / 4);
     display_last_register(simu);
+    display_last_stacks(simu);
+}
+
+void MainWindow::on_pushButton_Data_released()
+{
+    data_file = QFileDialog::getOpenFileName(this, "open a file","");
+
+    QFile file(data_file);
+    if(!file.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"title","cannot open the file");
+    }
+    QTextStream in(&file);
+    QString input_text = in.readLine();
+    int cnt = 0;
+    char *buf;
+    buf = (char *)calloc(1024, sizeof(char));
+    while(!input_text.isNull()) {
+        buf = input_text.toUtf8().data();
+        uint32_t num = (uint32_t)strtol(buf, NULL, 2);
+        simu->stack_field[cnt] = (uint8_t)(num >> 24);
+        simu->stack_field[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->stack_field[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->stack_field[cnt + 3] = (uint8_t)(num & (0b11111111));
+        input_text = in.readLine(256);
+        cnt += 4;
+    }
+    display_last_stacks(simu);
+    file.close();
 }

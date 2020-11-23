@@ -42,6 +42,8 @@ private slots:
 
     void on_pushButton_All_released();
 
+    void on_pushButton_Data_released();
+
 private:
     Ui::MainWindow *ui;
 
@@ -56,6 +58,8 @@ private:
     int next_step = 1;
 
     QString file_name;
+
+    QString data_file;
 
     Simulator* simu;
 

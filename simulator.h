@@ -26,6 +26,7 @@ enum Register_f {F0, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11,
 typedef struct {
     int32_t registers[REGISTER_NUM];
     float registers_f[REGISTER_NUM];
+    int condition_code[8];
 
     uint8_t* text_field;
     uint8_t* stack_field;
@@ -35,6 +36,8 @@ typedef struct {
 
 struct Small_simu{
     int32_t registers[REGISTER_NUM];
+    float registers_f[REGISTER_NUM];
+    int condition_code[8];
 
     uint8_t* stack;
 
@@ -59,6 +62,8 @@ public:
         memset(small_simu->stack, 0, sizeof(uint8_t) * stack_size);
 
         memset(small_simu->registers, 0, sizeof(small_simu->registers));
+        memset(small_simu->registers_f, 0, sizeof(small_simu->registers_f));
+        memset(small_simu->condition_code, 0, sizeof(small_simu->condition_code));
 
         small_simu->pc = 0;
 
@@ -79,6 +84,14 @@ public:
 
         for(int i = 0; i < 32; i++) {
             new_simu->registers[i] = simu->registers[i];
+        }
+
+        for(int i = 0; i < 32; i++) {
+            new_simu->registers_f[i] = simu->registers_f[i];
+        }
+
+        for(int i = 0; i < 8; i++) {
+            new_simu->condition_code[i] = simu->condition_code[i];
         }
 
         new_simu->pc = simu->pc;
@@ -111,6 +124,14 @@ public:
     void change_simu(Simulator* simu) {
         for(int i = 0; i < 32; i++) {
             simu->registers[i] = now_node->registers[i];
+        }
+
+        for(int i = 0; i < 32; i++) {
+            simu->registers_f[i] = now_node->registers_f[i];
+        }
+
+        for(int i = 0; i < 8; i++) {
+            simu->condition_code[i] = now_node->condition_code[i];
         }
 
         simu->pc = now_node->pc;

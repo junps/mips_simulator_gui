@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <cmath>
 #include <QDebug>
 
 #include "instruction.h"
@@ -38,7 +39,7 @@ static void lw(Simulator* simu) {
     uint32_t rs = get_rs(simu);
     uint32_t rt = get_rt(simu);
     int32_t imm = get_imm(simu);
-    uint32_t num = ret_32bit(simu, simu->registers[rs] + imm);
+    int32_t num = ret_32bit(simu, simu->registers[rs] + imm);
     simu->registers[rt] = num;
     simu->pc += 4;
 }
@@ -186,6 +187,162 @@ static void out_f(Simulator* simu) {
     simu->pc += 4;
 }
 
+void bt_s(Simulator* simu) {
+    uint32_t rt = get_rt(simu);
+    uint32_t cc = (rt >> 2) & 0b111;
+    int32_t imm = get_imm(simu);
+    if(simu->condition_code[cc] == 1) {
+        simu->pc += (imm << 2) + 4;
+    } else {
+        simu->pc += 4;
+    }
+}
+
+void bf_s(Simulator* simu) {
+    uint32_t rt = get_rt(simu);
+    uint32_t cc = (rt >> 2) & 0b111;
+    int32_t imm = get_imm(simu);
+    if(simu->condition_code[cc] == 0) {
+        simu->pc += (imm << 2) + 4;
+    } else {
+        simu->pc += 4;
+    }
+}
+
+void add_s(Simulator* simu) {
+    uint32_t fs = get_rd(simu);
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    simu->registers_f[fd] = simu->registers_f[fs] + simu->registers_f[ft];
+    simu->pc += 4;
+}
+
+void sub_s(Simulator* simu) {
+    uint32_t fs = get_rd(simu);
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    simu->registers_f[fd] = simu->registers_f[fs] - simu->registers_f[ft];
+    simu->pc += 4;
+}
+
+void mul_s(Simulator* simu) {
+    uint32_t fs = get_rd(simu);
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    simu->registers_f[fd] = simu->registers_f[fs] * simu->registers_f[ft];
+    simu->pc += 4;
+}
+
+void div_s(Simulator* simu) {
+    uint32_t fs = get_rd(simu);
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    simu->registers_f[fd] = simu->registers_f[fs] / simu->registers_f[ft];
+    simu->pc += 4;
+}
+
+void mov_s(Simulator* simu) {
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    simu->registers_f[fd] = simu->registers_f[ft];
+    simu->pc += 4;
+}
+
+void neg_s(Simulator* simu) {
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    simu->registers_f[fd] = -simu->registers_f[ft];
+    simu->pc += 4;
+}
+
+void abs_s(Simulator* simu) {
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    simu->registers_f[fd] = abs(simu->registers_f[ft]);
+    simu->pc += 4;
+}
+
+void sqrt_s(Simulator* simu) {
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    simu->registers_f[fd] = sqrt(simu->registers_f[ft]);
+    simu->pc += 4;
+}
+
+void lw_s(Simulator* simu) {
+    uint32_t rs = get_rs(simu);
+    uint32_t ft = get_rt(simu);
+    int32_t imm = get_imm(simu);
+    int32_t num = ret_32bit(simu, simu->registers[rs] + imm);
+    union { float f; int i; } f_and_i;
+    f_and_i.i = num;
+    simu->registers_f[ft] = f_and_i.f;
+    simu->pc += 4;
+}
+
+void sw_s(Simulator* simu) {
+    uint32_t rs = get_rs(simu);
+    uint32_t ft = get_rt(simu);
+    int32_t imm = get_imm(simu);
+    union { float f; int i; } f_and_i;
+    f_and_i.f = simu->registers_f[ft];
+    divide_8bits_store(simu, simu->registers[rs] + imm, f_and_i.i);
+    simu->pc += 4;
+}
+
+void ftoi(Simulator* simu) {
+    uint32_t fs = get_rs(simu);
+    uint32_t rt = get_rt(simu);
+    simu->registers[rt] = (int)simu->registers_f[fs];
+    simu->pc += 4;
+}
+
+void itof(Simulator* simu) {
+    uint32_t rs = get_rs(simu);
+    uint32_t ft = get_rt(simu);
+    simu->registers_f[ft] = (float)simu->registers[rs];
+    simu->pc += 4;
+}
+
+void c_eq_s(Simulator* simu) {
+    uint32_t fs = get_rd(simu);
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    uint32_t cc = (fd >> 2) & 0b111;
+    if (simu->registers_f[fs] == simu->registers_f[ft]) {
+        simu->condition_code[cc] = 1;
+    } else {
+        simu->condition_code[cc] = 0;
+    }
+    simu->pc += 4;
+}
+
+void c_lt_s(Simulator* simu) {
+    uint32_t fs = get_rd(simu);
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    uint32_t cc = (fd >> 2) & 0b111;
+    if (simu->registers_f[fs] < simu->registers_f[ft]) {
+        simu->condition_code[cc] = 1;
+    } else {
+        simu->condition_code[cc] = 0;
+    }
+    simu->pc += 4;
+}
+
+void c_le_s(Simulator* simu) {
+    uint32_t fs = get_rd(simu);
+    uint32_t ft = get_rt(simu);
+    uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
+    uint32_t cc = (fd >> 2) & 0b111;
+    if (simu->registers_f[fs] <= simu->registers_f[ft]) {
+        simu->condition_code[cc] = 1;
+    } else {
+        simu->condition_code[cc] = 0;
+    }
+    simu->pc += 4;
+}
+
 static void set_inst(uint32_t opcode, uint32_t funct, uint32_t fmt, int unique, instruction_func_t* inst) {
     if(unique == 1) {
         for(int i = 0; i < 64; i++) {
@@ -203,6 +360,7 @@ static void set_inst(uint32_t opcode, uint32_t funct, uint32_t fmt, int unique, 
         }
     } else {
         instructions[opcode][funct][fmt] = inst;
+        instructions[opcode][funct][(fmt | 0b1)] = inst;
     }
 }
 
@@ -232,4 +390,22 @@ void init_instructions(void) {
     set_inst(0b000011, dummybit, dmfmt, 1, &jal);
     set_inst(0b011010, dummybit, dmfmt, 1, &in_f);
     set_inst(0b011011, dummybit, dmfmt, 1, &out_f);
+
+    set_inst(0b010001, dummybit, 0b011, 2, &bt_s);
+    set_inst(0b010001, dummybit, 0b010, 2, &bf_s);
+    set_inst(0b010001, 0b000000, 0b100, 3, &add_s);
+    set_inst(0b010001, 0b000001, 0b100, 3, &sub_s);
+    set_inst(0b010001, 0b000010, 0b100, 3, &mul_s);
+    set_inst(0b010001, 0b000011, 0b100, 3, &div_s);
+    set_inst(0b010001, 0b000110, 0b100, 3, &mov_s);
+    set_inst(0b010001, 0b000111, 0b100, 3, &neg_s);
+    set_inst(0b010001, 0b000101, 0b100, 3, &abs_s);
+    set_inst(0b010001, 0b000100, 0b100, 3, &sqrt_s);
+    set_inst(0b010001, 0b110010, 0b100, 3, &c_eq_s);
+    set_inst(0b010001, 0b111100, 0b100, 3, &c_lt_s);
+    set_inst(0b010001, 0b111110, 0b100, 3, &c_le_s);
+    set_inst(0b110001, dummybit, dmfmt, 1, &lw_s);
+    set_inst(0b111001, dummybit, dmfmt, 1, &sw_s);
+    set_inst(0b111000, dummybit, dmfmt, 1, &ftoi);
+    set_inst(0b110000, dummybit, dmfmt, 1, &itof);
 }
