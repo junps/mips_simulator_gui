@@ -421,12 +421,15 @@ void MainWindow::on_pushButton_Back_released()
 
 void MainWindow::on_pushButton_All_released()
 {
+    uint32_t pre_pc = -1;
     while(1) {
         uint32_t opcode = get_opcode(simu);
         uint32_t funct = get_func(simu);
         uint32_t fmt = get_fmt(simu);
 
 //        printf("opcode : %d, funct : %d\n", opcode, funct);
+        if(pre_pc == simu->pc) break;
+        pre_pc = simu->pc;
 
         if(opcode == 0b111111) break;
 

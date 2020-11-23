@@ -51,7 +51,7 @@ public:
     int siz;
     int mx_siz = 10000;
     int ini_sp = 0;
-    int stack_size = 1024;
+    int stack_size = 4096;
 
     Small_simu *create_initial() {
         Small_simu* small_simu = (Small_simu*)malloc(sizeof(Small_simu));

@@ -178,8 +178,10 @@ static void out_f(Simulator* simu) {
         printf("error");
         exit(1);
     }
-    char buf = rt & 0xff;
-    fwrite(&buf, 1, sizeof(char), fp);
+    char buf[100];
+    sprintf(buf, "%x", (simu->registers[rt] & 0xff));
+    fwrite(buf, 2, sizeof(char), fp);
+    fputc( '\n', fp );
     fclose(fp);
     simu->pc += 4;
 }
