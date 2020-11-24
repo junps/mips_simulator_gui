@@ -67,6 +67,12 @@ MainWindow::MainWindow(QWidget *parent)
     for(int i = 0; i < l_lis.stack_size; i++) {
         ui->tableWidget_Memory->setRowHeight(i, 27);
     }
+
+    remove("out_put.txt");
+    if((fp_out = fopen("out_put.txt", "w")) == NULL) {
+        printf("error");
+        exit(1);
+    }
 }
 
 MainWindow::~MainWindow()

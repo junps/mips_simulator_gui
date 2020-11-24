@@ -11,6 +11,8 @@
 
 instruction_func_t* instructions[64][64][8];
 
+FILE *fp_out;
+
 void add(Simulator* simu) {
     uint32_t rs = get_rs(simu);
     uint32_t rt = get_rt(simu);
@@ -174,16 +176,10 @@ static void in_f(Simulator* simu) {
 
 static void out_f(Simulator* simu) {
     uint32_t rt = get_rt(simu);
-    FILE *fp;
-    if((fp = fopen("out_put.txt", "a")) == NULL) {
-        printf("error");
-        exit(1);
-    }
     char buf[100];
     sprintf(buf, "%x", (simu->registers[rt] & 0xff));
-    fwrite(buf, 2, sizeof(char), fp);
-    fputc( '\n', fp );
-    fclose(fp);
+    fwrite(buf, 2, sizeof(char), fp_out);
+    fputc('\n', fp_out);
     simu->pc += 4;
 }
 
