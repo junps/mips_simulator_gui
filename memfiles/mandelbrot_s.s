@@ -129,7 +129,6 @@ ble_else.122:
 	addi	$v0, $v0, 1
 	j	yloop.40
 _min_caml_start:
-	addi	$sp, $zero, 0
 	li	$v0, 0
 	move	$t8, $ra
 	sw	$t8, 4($sp)
@@ -138,15 +137,10 @@ _min_caml_start:
 	addi	$sp, $sp, -8
 	lw	$t8, 4($sp)
 	move	$ra, $t8
+	j	loop
 min_caml_float_of_int:
-	ftoi	$v0, $f0
+	itof	$f0, $v0
 	jr	$ra
 min_caml_print_int:
 	out	$v0
-	srl	$t8, $v0, 8
-	out	$t8
-	srl	$t8, $t8, 8
-	out	$t8
-	srl	$t8, $t8, 8
-	out	$t8
 	jr	$ra

@@ -29,4 +29,13 @@ uint32_t get_address(Simulator* simu);
 
 uint32_t get_fmt(Simulator* simu);
 
+union Single {
+    float f;
+    int i;
+};
+
+union Single fdiv(union Single a, union Single b);
+
+union Single fsqrt(union Single a);
+
 #endif // SIMU_FUNCTIONS_H
