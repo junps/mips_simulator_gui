@@ -15,6 +15,8 @@ using namespace std;
 #include "simu_functions.h"
 #include "instruction.h"
 
+#include <string.h>
+
 #define MEMORY_SIZE (2000000000)
 #define STACK_SIZE (1024 * 1024)
 
@@ -398,7 +400,17 @@ void MainWindow::on_pushButton_Open_released()
 {
     file_name = QFileDialog::getOpenFileName(this, "open a file","");
 
-    displayFile(file_name);
+    string file_name_std = file_name.toStdString();
+
+    int n = file_name_std.size();
+    string base_name = file_name_std.substr(0, n - 9);
+    string data_name = base_name + "data.mem";
+    string debug_name = base_name + "debug.txt";
+
+    data_file = QString::fromStdString(data_name);
+    QString debug_file = QString::fromStdString(debug_name);
+
+    displayFile(debug_file);
 
     QFile file(file_name);
     if(!file.open(QFile::ReadOnly | QFile::Text)) {
@@ -420,6 +432,29 @@ void MainWindow::on_pushButton_Open_released()
         cnt += 4;
     }
     file.close();
+
+    QFile file_d(data_file);
+    if(!file_d.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"title","cannot open the file");
+    }
+    QTextStream in_d(&file_d);
+    QString input_text_d = in_d.readLine();
+    int cnt_d = 0;
+    char *buf_d;
+    buf_d = (char *)calloc(1024, sizeof(char));
+
+    while(!input_text_d.isNull()) {
+        buf_d = input_text_d.toUtf8().data();
+        uint32_t num = (uint32_t)strtol(buf_d, NULL, 2);
+        simu->stack_field[cnt_d] = (uint8_t)(num >> 24);
+        simu->stack_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->stack_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->stack_field[cnt_d + 3] = (uint8_t)(num & (0b11111111));
+        input_text_d = in_d.readLine(256);
+        cnt_d += 4;
+    }
+    display_last_stacks(simu);
+    file_d.close();
 }
 
 
@@ -556,6 +591,7 @@ void MainWindow::on_pushButton_Back_released()
 
 void MainWindow::on_pushButton_All_released()
 {
+    long long int num_instructions = 0;
     uint32_t pre_pc = -1;
     while(1) {
         uint32_t opcode = get_opcode(simu);
@@ -575,35 +611,10 @@ void MainWindow::on_pushButton_All_released()
         }
 
         instructions[opcode][funct][fmt](simu);
+        num_instructions++;
     }
     heigh_light_row(simu->pc / 4);
     display_last_register(simu);
     display_last_stacks(simu);
-}
-
-void MainWindow::on_pushButton_Data_released()
-{
-    data_file = QFileDialog::getOpenFileName(this, "open a file","");
-
-    QFile file(data_file);
-    if(!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this,"title","cannot open the file");
-    }
-    QTextStream in(&file);
-    QString input_text = in.readLine();
-    int cnt = 0;
-    char *buf;
-    buf = (char *)calloc(1024, sizeof(char));
-    while(!input_text.isNull()) {
-        buf = input_text.toUtf8().data();
-        uint32_t num = (uint32_t)strtol(buf, NULL, 2);
-        simu->stack_field[cnt] = (uint8_t)(num >> 24);
-        simu->stack_field[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->stack_field[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->stack_field[cnt + 3] = (uint8_t)(num & (0b11111111));
-        input_text = in.readLine(256);
-        cnt += 4;
-    }
-    display_last_stacks(simu);
-    file.close();
+    qDebug() << num_instructions;
 }

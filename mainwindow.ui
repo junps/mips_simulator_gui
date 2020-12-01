@@ -79,14 +79,7 @@
         <item>
          <widget class="QPushButton" name="pushButton_Open">
           <property name="text">
-           <string>Open_i</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QPushButton" name="pushButton_Data">
-          <property name="text">
-           <string>Open_d</string>
+           <string>Open</string>
           </property>
          </widget>
         </item>
