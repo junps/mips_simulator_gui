@@ -11,9 +11,6 @@
 
 instruction_func_t* instructions[64][64][8];
 
-FILE *fp_out;
-//QTextStream out;
-
 QString output_file = "output.txt";
 QFile file(output_file);
 
