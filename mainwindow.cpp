@@ -61,12 +61,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     remove("output.txt");
 
-//    remove("out_put.txt");
-//    if((fp_out = fopen("out_put.txt", "w, ccs=UTF-8")) == NULL) {
-//        printf("error");
-//        exit(1);
-//    }
-
     init_instructions();
 
     simu = create_simu(MEMORY_SIZE, STACK_SIZE, 0, 0);
@@ -619,5 +613,5 @@ void MainWindow::on_pushButton_All_released()
     heigh_light_row(simu->pc / 4);
     display_last_register(simu);
     display_last_stacks(simu);
-    qDebug() << num_instructions;
+    qDebug() << "num_insructions" << num_instructions;
 }

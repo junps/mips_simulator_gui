@@ -12,11 +12,13 @@ SOURCES += \
     instruction.cpp \
     main.cpp \
     mainwindow.cpp \
+    no_gui.cpp \
     simu_functions.cpp
 
 HEADERS += \
     instruction.h \
     mainwindow.h \
+    no_gui.h \
     simu_functions.h \
     simulator.h
 
