@@ -38,4 +38,10 @@ union Single fdiv(union Single a, union Single b);
 
 union Single fsqrt(union Single a);
 
+union Single fadd(union Single a, union Single b);
+
+union Single fsub(union Single a, union Single b);
+
+union Single fmul(union Single a, union Single b);
+
 #endif // SIMU_FUNCTIONS_H

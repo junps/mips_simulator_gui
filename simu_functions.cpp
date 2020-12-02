@@ -75,20 +75,20 @@ uint32_t get_fmt(Simulator* simu) {
     return (((inst >> 24) & 3) << 1) | ((inst >> 16) & 1);
 }
 
-union Single bare_div(union Single a){
+union Single bare(union Single a){
     union Single r;
     r.i =  (a.i & 0x007fffff);
     return r;
 }//仮数部
 
-union Single init_div(union Single a){//初期値
+union Single init(union Single a){//初期値
     union Single r, next;
     next.i = a.i + 1;
     r.f = (1 / (a.f * powf(2, 13)) + 1 / (next.f * powf(2, 13))) / 2;
     return r;
 }
 
-union Single constant_div(union Single x0, union Single a){//定数項(24bit数, 先頭は1)
+union Single constant(union Single x0, union Single a){//定数項(24bit数, 先頭は1)
     union Single r;
     r.i = 2 * x0.i - (int)(((long long int) x0.i * (long long int) x0.i * (long long int) a.i) >> 34);
     if ((a.i & 0x3ff) == 0x2 ||
@@ -102,16 +102,16 @@ union Single constant_div(union Single x0, union Single a){//定数項(24bit数,
         (a.i & 0x3ff) == 0x20||
         (a.i & 0x3ff) == 0x22)
         r.i = r.i + 1;//微調整
-    return bare_div(r);
+    return bare(r);
 }
 
-union Single grad_div(union Single x0){//勾配(13bit数)
+union Single grad(union Single x0){//勾配(13bit数)
     union Single r;
     r.i = (int) (((long long int) x0.i *(long long int) x0.i) >> 35);
-    return bare_div(r);
+    return bare(r);
 }
 
-union Single appr_div(union Single c, union Single g, union Single a){//近似値
+union Single appr(union Single c, union Single g, union Single a){//近似値
     union Single r;
     r.i = c.i - (int)(((long int)a.i * (long int)g.i)>>12);
     return r;
@@ -121,44 +121,65 @@ union Single man_finv(union Single a){//aの逆数の仮数部計算
     union Single c, g, x0, a_l, a_m;
     a_l.i = (a.i & 0x1fff);//仮数下位
     a_m.i = ((a.i & 0x7fe000) >> 13) | 0x400;//仮数上位+ケチ表現
-    x0.i = bare_div(init_div(a_m)).i | 0x800000;//初期値
-    c = constant_div(x0, a_m);
-    g = grad_div(x0);
-    return appr_div(c, g, a_l);
+    x0.i = bare(init(a_m)).i | 0x800000;//初期値
+    c = constant(x0, a_m);
+    g = grad(x0);
+    return appr(c, g, a_l);
+}
+
+union Single pseudo_finv(union Single a){
+    union Single m, r;
+    int a_s = (a.i >> 31) & 1;
+    int a_e = (a.i >> 23) & 0xff;
+    m = man_finv(a);
+    r.i = (a_s << 31) | (a_e << 23) | (m.i & 0x7fffff);
+    return r;
+}
+
+union Single fmul_for_fdiv(union Single a, union Single b){
+    union Single c;
+    int a_s, a_e, a_m, b_s, b_e, b_m;
+    a_s = (a.i >> 31) & 1;
+    a_e = (a.i >> 23) & 0xff;
+    a_m = (a.i & 0x7fffff) | 0x800000;//ケチ表現付き
+    b_s = (b.i >> 31) & 1;
+    b_e = (b.i >> 23) & 0xff;
+    b_m = (b.i & 0x7fffff) | 0x800000;//ケチ表現付き
+    int sy = a_s ^ b_s;
+    int eyp = a_e + 126 - b_e;
+    int eypi = eyp+1;
+    int underflow1 = (eyp <= 0) ? 1 : 0;
+    int underflow2 = (eypi <= 0) ? 1 : 0;
+    int ovf_f = (eyp >= 255) ? 1 : 0;
+    long long int my1 = (long long int)a_m * (long long int)b_m;
+    int my48 = (my1 >> 47) & 1;
+    int ovf = (ovf_f==1 || (my48 && (eypi >= 255))) ? 1 : 0;//ovf
+    int ey =
+    ovf ? 0xff :
+    my48 && underflow2 ? 0 :
+    my48 ? (eypi & 0xff) :
+    underflow1 ? 0 :
+    eyp & 0xff;
+    int my =
+    (ovf) ? 0 :
+    my48 && underflow2 ? 0 :
+    my48 ? (my1>>24) & 0x7fffff :
+    underflow1 ? 0 :
+    (my1>>23) & 0x7fffff;
+    c.i = (sy<<31) | (ey<<23) | my;
+    return c;
 }
 
 union Single fdiv(union Single a, union Single b){//(a/b)
-    union Single man_bi, man_a, m, r;
-    int s = (a.i >> 31) ^ (b.i >> 31);
-    int e_a = (a.i >> 23) & 0xff;
-    int e_b = (b.i >> 23) & 0xff;
-    int e = e_a + 126 - e_b;
-    int u1 = e <= 0 ? 1 : 0;//underflow_flag1
-    int u2 = e + 1 <= 0 ? 1 : 0;//underflow_flag2
-    int ovf = e >= 255 ? 1 : 0;//overflow_flag
-    man_bi.i = man_finv(b).i | 0x800000;
-    man_a.i = (a.i & 0x7fffff) | 0x800000;
-    m.i = (int)(((long long int)man_a.i * (long long int)man_bi.i)>>23);
-    int man47 = m.i >> 24;
-    if (ovf == 1){
-        m.i = 0;
-        e = 0xff;
-    }else{
-        if (man47 == 1){
-            m.i = m.i>>1;
-            e = e + 1;
-            if (u2 == 1){
-                e = 0;
-                m.i = 0;
-            }
-        }else{
-            if (u1 == 1){
-                e = 0;
-                m.i = 0;
-            }
-        }
-    }
-    r.i = (s<<31) | (e<<23) | (m.i & 0x7fffff);
+    union Single b_inv, q;
+    b_inv = pseudo_finv(b);
+    q = fmul_for_fdiv(a, b_inv);
+    return q;
+}
+
+union Single bare_sqrt(union Single a){
+    union Single r;
+    r.i =  (a.i & 0x007fffff);
     return r;
 }
 
@@ -185,13 +206,13 @@ union Single constant_sqrt(union Single x0, union Single k){//定数(24bit数, �
         a.i = k.i | 0x200;
         r.i = x0.i / 2 + ((long long int)a.i << 37) / x0.i;
     }
-    return bare_div(r);
+    return bare_sqrt(r);
 }
 
 union Single grad_sqrt(union Single x0){//勾配(13bit数)
     union Single r;
     r.i = (int)((long long int) 0x1000000000 / (long long int)x0.i);
-    return bare_div(r);
+    return bare_sqrt(r);
 }
 
 union Single appr_sqrt(union Single c, union Single g, union Single a,
@@ -211,7 +232,7 @@ union Single man_fsqrt(union Single a){//fsqrt(a)の仮数部
     a_l.i = (a.i & 0x3fff);
     a_m.i = ((a.i & 0x7fc000) >> 14);
     key.i = a_m.i | (a_e << 9);
-    x0.i = 0x00800000 | bare_div(init_sqrt(key)).i;
+    x0.i = 0x00800000 | bare_sqrt(init_sqrt(key)).i;
     c = constant_sqrt(x0, key);
     g = grad_sqrt(x0);
     r = appr_sqrt(c, g, a_l, a_e);
@@ -235,4 +256,155 @@ union Single fsqrt(union Single a){//fsqrt(a)
     }
     r.i = (e << 23) | m.i;
     return r;
+}
+
+int LZC(int a){//LeadingZeroCounter
+    int cnt = 0;
+    for (int i = 0; i < 24; i++){
+        if((a & 0x800000) == 0x800000){
+            break;
+        } else {
+            cnt++;
+            a = (a << 1) & 0xffffff;
+        }
+    }
+    return cnt;
+}
+
+
+union Single fadd(union Single a, union Single b){//a + b
+    union Single c;
+    int a_s, a_e, a_m, b_s, b_e, b_m, l_s, l_e, l_m, s_s, s_e, s_m;
+    a_s = (a.i >> 31) & 1;
+    a_e = (a.i >> 23) & 0xff;
+    a_m = (a.i & 0x7fffff) | 0x800000;
+    b_s = (b.i >> 31) & 1;
+    b_e = (b.i >> 23) & 0xff;
+    b_m = (b.i & 0x7fffff) | 0x800000;
+    if (a_e > b_e || (a_e == b_e && a_m > b_m)){
+        l_s = a_s;
+        l_e = a_e;
+        l_m = a_m;
+        s_s = b_s;
+        s_e = b_e;
+        s_m = b_m;
+    } else {
+        l_s = b_s;
+        l_e = b_e;
+        l_m = b_m;
+        s_s = a_s;
+        s_e = a_e;
+        s_m = a_m;
+    }
+    int diff_e = l_e - s_e > 24 ? 24 : l_e - s_e;
+    int s_m_shifted = s_m >> diff_e;
+    int m_raw;
+    if (s_s ^ l_s) {
+        m_raw = l_m - s_m_shifted;
+    } else {
+        m_raw = l_m + s_m_shifted;
+    }
+    int m25 = (m_raw >> 24) & 1;
+    int shift_m = LZC(m_raw);
+    int m =
+        m25==1 ? (m_raw >> m25) & 0x7fffff :
+        (m_raw << shift_m) & 0x7fffff;
+    int e =
+    m25==1 ? l_e + m25 :
+    l_e - shift_m;
+
+    c.i = (e <= 0) ? (l_s << 31) :
+    (e >= 255) ? (l_s << 31) | (0xff << 23) :
+    (l_s << 31) | (e << 23) | m;
+    return c;
+}
+
+union Single fsub(union Single a, union Single b){//a - b
+    union Single c;
+    int a_s, a_e, a_m, b_s, b_e, b_m, l_s, l_e, l_m, s_s, s_e, s_m;
+    a_s = (a.i >> 31) & 1;
+    a_e = (a.i >> 23) & 0xff;
+    a_m = (a.i & 0x7fffff) | 0x800000;
+    b_s = (b.i >> 31) & 1;
+    b_e = (b.i >> 23) & 0xff;
+    b_m = (b.i & 0x7fffff) | 0x800000;
+    if (a_e > b_e || (a_e == b_e && a_m > b_m)){
+        l_s = a_s;
+        l_e = a_e;
+        l_m = a_m;
+        s_s = b_s;
+        s_e = b_e;
+        s_m = b_m;
+    } else {
+        l_s = b_s;
+        l_e = b_e;
+        l_m = b_m;
+        s_s = a_s;
+        s_e = a_e;
+        s_m = a_m;
+    }
+    int diff_e = l_e - s_e > 24 ? 24 : l_e - s_e;
+    int s_m_shifted = s_m >> diff_e;
+    int m_raw;
+    if (s_s ^ l_s) {
+        m_raw = l_m + s_m_shifted;
+    } else {
+        m_raw = l_m - s_m_shifted;
+    }
+    int m25 = (m_raw >> 24) & 1;
+    int shift_m = LZC(m_raw);
+    int m =
+        m25==1 ? (m_raw >> m25) & 0x7fffff :
+        (m_raw << shift_m) & 0x7fffff;
+    int e =
+    m25==1 ? l_e + m25 :
+    l_e - shift_m > 0 ? l_e - shift_m :
+    0;
+    int s;
+    if (a_e > b_e || (a_e == b_e && a_m > b_m)){
+        if (a_s == 0){
+            s = 0;
+        } else {
+            s = 1;
+        }
+    } else {
+        if (b_s == 1){
+            s = 0;
+        } else {
+            s = 1;
+        }
+    }
+
+    c.i = (e == 0) ? (s << 31) :
+    (e >= 255) ? (s << 31) | (0xff << 23) :
+    (s << 31) | (e << 23) | m;
+    return c;
+}
+
+union Single fmul(union Single a, union Single b){//a * b
+    union Single c;
+    int a_s, a_e, a_m, b_s, b_e, b_m;
+    a_s = (a.i >> 31) & 1;
+    a_e = (a.i >> 23) & 0xff;
+    a_m = (a.i & 0x7fffff) | 0x800000;//ケチ表現付き
+    b_s = (b.i >> 31) & 1;
+    b_e = (b.i >> 23) & 0xff;
+    b_m = (b.i & 0x7fffff) | 0x800000;//ケチ表現付き
+    int sy = a_s ^ b_s;
+    int eyp = a_e + b_e - 127;
+    int eypi = eyp+1;
+    int underflow = (eyp < 0 || a_e == 0 || b_e == 0) ? 1 : 0;
+    int ovf_f = (eyp >= 255) ? 1 : 0;
+    long long int my1 = (long long int)a_m * (long long int)b_m;
+    int my48 = (my1 >> 47) & 1;
+    int ovf = (ovf_f==1 || (my48 && (eypi >= 255))) ? 1 : 0;//ovf
+    int ey =
+    underflow ? 0 :
+    ovf ? 255 :
+    my48 ? (eypi & 0xff) : eyp & 0xff;
+    int my =
+    (underflow || ovf) ? 0 :
+    my48 ? (my1>>24) & 0x7fffff : (my1>>23) & 0x7fffff;
+    c.i = (sy<<31) | (ey<<23) | my;
+    return c;
 }

@@ -12,6 +12,10 @@
 instruction_func_t* instructions[64][64][8];
 
 FILE *fp_out;
+//QTextStream out;
+
+QString output_file = "output.txt";
+QFile file(output_file);
 
 void add(Simulator* simu) {
     uint32_t rs = get_rs(simu);
@@ -178,8 +182,11 @@ static void out_f(Simulator* simu) {
     uint32_t rt = get_rt(simu);
     char buf[100];
     sprintf(buf, "%x", (simu->registers[rt] & 0xff));
-    fwrite(buf, 2, sizeof(char), fp_out);
+    //fwrite(buf, 2, sizeof(char), fp_out);
     //fputc('\n', fp_out);
+
+    QTextStream out(&file);
+    out << buf;
     simu->pc += 4;
 }
 
@@ -209,7 +216,12 @@ void add_s(Simulator* simu) {
     uint32_t fs = get_rd(simu);
     uint32_t ft = get_rt(simu);
     uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
-    simu->registers_f[fd] = simu->registers_f[fs] + simu->registers_f[ft];
+
+    union Single a, b;
+    a.f = simu->registers_f[fs];
+    b.f = simu->registers_f[ft];
+    simu->registers_f[fd] = fadd(a, b).f;
+    //simu->registers_f[fd] = simu->registers_f[fs] + simu->registers_f[ft];
     simu->pc += 4;
 }
 
@@ -217,7 +229,12 @@ void sub_s(Simulator* simu) {
     uint32_t fs = get_rd(simu);
     uint32_t ft = get_rt(simu);
     uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
-    simu->registers_f[fd] = simu->registers_f[fs] - simu->registers_f[ft];
+
+    union Single a, b;
+    a.f = simu->registers_f[fs];
+    b.f = simu->registers_f[ft];
+    simu->registers_f[fd] = fsub(a, b).f;
+    //simu->registers_f[fd] = simu->registers_f[fs] - simu->registers_f[ft];
     simu->pc += 4;
 }
 
@@ -225,7 +242,12 @@ void mul_s(Simulator* simu) {
     uint32_t fs = get_rd(simu);
     uint32_t ft = get_rt(simu);
     uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
-    simu->registers_f[fd] = simu->registers_f[fs] * simu->registers_f[ft];
+
+    union Single a, b;
+    a.f = simu->registers_f[fs];
+    b.f = simu->registers_f[ft];
+    simu->registers_f[fd] = fmul(a, b).f;
+    //simu->registers_f[fd] = simu->registers_f[fs] * simu->registers_f[ft];
     simu->pc += 4;
 }
 
@@ -237,8 +259,8 @@ void div_s(Simulator* simu) {
     union Single a, b;
     a.f = simu->registers_f[fs];
     b.f = simu->registers_f[ft];
-    //simu->registers_f[fd] = simu->registers_f[fs] / simu->registers_f[ft];
     simu->registers_f[fd] = fdiv(a, b).f;
+    //simu->registers_f[fd] = simu->registers_f[fs] / simu->registers_f[ft];
     simu->pc += 4;
 }
 
@@ -413,4 +435,10 @@ void init_instructions(void) {
     set_inst(0b111001, dummybit, dmfmt, 1, &sw_s);
     set_inst(0b111000, dummybit, dmfmt, 1, &ftoi);
     set_inst(0b110000, dummybit, dmfmt, 1, &itof);
+
+
+    if (!file.open(QIODevice::WriteOnly)) {
+        qDebug() << "cannot open output.txt";
+        return;
+    }
 }

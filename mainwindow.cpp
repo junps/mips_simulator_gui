@@ -59,6 +59,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     InitialTableDisplay();
 
+    remove("output.txt");
+
+//    remove("out_put.txt");
+//    if((fp_out = fopen("out_put.txt", "w, ccs=UTF-8")) == NULL) {
+//        printf("error");
+//        exit(1);
+//    }
+
     init_instructions();
 
     simu = create_simu(MEMORY_SIZE, STACK_SIZE, 0, 0);
@@ -70,11 +78,6 @@ MainWindow::MainWindow(QWidget *parent)
         ui->tableWidget_Memory->setRowHeight(i, 27);
     }
 
-    remove("out_put.txt");
-    if((fp_out = fopen("out_put.txt", "w")) == NULL) {
-        printf("error");
-        exit(1);
-    }
 }
 
 MainWindow::~MainWindow()

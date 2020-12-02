@@ -1,6 +1,9 @@
 #ifndef INSTRUCTION_H
 #define INSTRUCTION_H
 
+#include <QTextStream>
+#include <QFileDialog>
+
 #include "simulator.h"
 
 void init_instructions(void);
