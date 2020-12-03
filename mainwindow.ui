@@ -46,6 +46,20 @@
          </spacer>
         </item>
         <item>
+         <widget class="QSpinBox" name="spinBox_Nbp">
+          <property name="maximum">
+           <number>1000000000</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_Nbp">
+          <property name="text">
+           <string>N_bp</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <widget class="QSpinBox" name="spinBox">
           <property name="maximum">
            <number>100000000</number>

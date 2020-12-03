@@ -615,3 +615,59 @@ void MainWindow::on_pushButton_All_released()
     display_last_stacks(simu);
     qDebug() << "num_insructions" << num_instructions;
 }
+
+void MainWindow::on_spinBox_Nbp_valueChanged(int arg1)
+{
+    next_break_point = arg1 * 4;
+}
+
+void MainWindow::on_pushButton_Nbp_released()
+{
+    long long int pre_pc = -1;
+
+    bool same = false;
+    if(next_break_point == simu->pc) same = true;
+
+    while(1) {
+        uint32_t opcode = get_opcode(simu);
+        uint32_t funct = get_func(simu);
+        uint32_t fmt = get_fmt(simu);
+
+//        printf("opcode : %d, funct : %d\n", opcode, funct);
+
+        if(opcode == 0b111111) break;
+
+        if (instructions[opcode][funct][fmt] == NULL) {
+            printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+            printf("pc is %d\n", simu->pc / 4);
+            exit(1);
+        }
+
+        if(pre_pc == simu->pc) break;
+        pre_pc = simu->pc;
+
+        if(!same && next_break_point == simu->pc) break;
+        same = false;
+
+        instructions[opcode][funct][fmt](simu);
+
+
+        if(l_lis.now_node->next == l_lis.boss) {
+            l_lis.create_new(simu);
+            l_lis.siz++;
+            if(l_lis.siz > l_lis.mx_siz) {
+                l_lis.boss->next = l_lis.boss->next->next;
+                free(l_lis.boss->next->prev->stack);
+                free(l_lis.boss->next->prev);
+                l_lis.boss->next->prev = l_lis.boss;
+                l_lis.siz--;
+            }
+        } else {
+            l_lis.now_node = l_lis.now_node->next;
+            l_lis.change_simu(simu);
+        }
+    }
+    heigh_light_row(simu->pc / 4);
+    update_register_table();
+    update_memory_table();
+}

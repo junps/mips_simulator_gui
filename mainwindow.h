@@ -42,6 +42,10 @@ private slots:
 
     void on_pushButton_All_released();
 
+    void on_spinBox_Nbp_valueChanged(int arg1);
+
+    void on_pushButton_Nbp_released();
+
 private:
     Ui::MainWindow *ui;
 
@@ -53,7 +57,9 @@ private:
 
     void shift_simu_ary_next();
 
-    int next_step = 1;
+    long long int next_step = 1;
+
+    long long int next_break_point = 0;
 
     QString file_name;
 
