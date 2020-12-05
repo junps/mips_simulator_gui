@@ -50,7 +50,7 @@ static void lw(Simulator* simu) {
 static void lui(Simulator* simu) {
     uint32_t rt = get_rt(simu);
     int32_t imm = get_imm(simu);
-    int32_t num = (imm << 16) & 0xffff;
+    int32_t num = imm << 16;
     simu->registers[rt] = num;
     simu->pc += 4;
 }
@@ -181,10 +181,22 @@ static void in_f(Simulator* simu) {
     simu->pc += 4;
 }
 
+//static void out_f(Simulator* simu) {
+//    uint32_t rt = get_rt(simu);
+//    char buf[100];
+//    sprintf(buf, "%x", (simu->registers[rt] & 0xff));
+//    //fwrite(buf, 2, sizeof(char), fp_out);
+//    //fputc('\n', fp_out);
+
+//    QTextStream out(&file);
+//    out << buf;
+//    simu->pc += 4;
+//}
+
 static void out_f(Simulator* simu) {
     uint32_t rt = get_rt(simu);
     char buf[100];
-    sprintf(buf, "%x", (simu->registers[rt] & 0xff));
+    sprintf(buf, "%d", simu->registers[rt]);
     //fwrite(buf, 2, sizeof(char), fp_out);
     //fputc('\n', fp_out);
 
