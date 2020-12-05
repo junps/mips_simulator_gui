@@ -846,21 +846,9 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtGui/qicon.h \
 		simulator.h \
 		ui_mainwindow.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtCore/QVariant \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QApplication \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qapplication.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtCore/qcoreapplication.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtCore/qeventloop.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdesktopwidget.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtGui/qguiapplication.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtGui/qinputmethod.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QHBoxLayout \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayout.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayoutitem.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qgridlayout.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QHeaderView \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qheaderview.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTableWidget \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtablewidget.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtableview.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractitemview.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractscrollarea.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qframe.h \
@@ -876,27 +864,6 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstyle.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtabbar.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qrubberband.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QListWidget \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlistwidget.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlistview.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMenuBar \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmenubar.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmenu.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qaction.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qactiongroup.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QPushButton \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qpushbutton.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qabstractbutton.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QSpacerItem \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QSpinBox \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qspinbox.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QStatusBar \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qstatusbar.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTableWidget \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtablewidget.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qtableview.h \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QVBoxLayout \
-		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QTableWidgetItem \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QFileDialog \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qfiledialog.h \
@@ -908,6 +875,8 @@ mainwindow.o: mainwindow.cpp mainwindow.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/QTextStream \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/QDebug \
 		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QListWidgetItem \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlistwidget.h \
+		/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlistview.h \
 		/usr/include/x86_64-linux-gnu/qt5/QtCore/Qt \
 		simu_functions.h \
 		instruction.h

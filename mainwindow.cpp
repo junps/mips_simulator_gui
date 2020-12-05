@@ -17,7 +17,7 @@ using namespace std;
 
 #include <string.h>
 
-#define MEMORY_SIZE (2000000000)
+#define MEMORY_SIZE (2000000)
 #define STACK_SIZE (1024 * 1024)
 
 string registers_name[] = { "ZERO", "AT", "V0", "V1", "A0", "A1", "A2", "A3", "T0", "T1",
@@ -68,9 +68,9 @@ MainWindow::MainWindow(QWidget *parent)
     for(int i = 0; i < 32 + 32 + 1 + 8; i++) {
         ui->tableWidget_Registers->setRowHeight(i, 27);
     }
-    for(int i = 0; i < l_lis.stack_size; i++) {
-        ui->tableWidget_Memory->setRowHeight(i, 27);
-    }
+//    for(int i = 0; i < l_lis.stack_size; i++) {
+//        ui->tableWidget_Memory->setRowHeight(i, 27);
+//    }
 
 }
 
@@ -115,11 +115,12 @@ void MainWindow::InitialTableDisplay()
     ui->tableWidget_Memory->setRowCount(l_lis.stack_size + 1);
     ui->tableWidget_Memory->setColumnCount(3);
 
-    QStringList vlabels2;
-    for(int i = 0; i <= l_lis.stack_size; i++) {
-        vlabels2 << QString::number(l_lis.ini_sp + i);
-    }
-    ui->tableWidget_Memory->setVerticalHeaderLabels(vlabels2);
+//    QStringList vlabels2;
+//    for(int i = 0; i <= l_lis.stack_size; i++) {
+//        vlabels2 << QString::number(l_lis.ini_sp + i);
+//    }
+
+    //ui->tableWidget_Memory->setVerticalHeaderLabels(vlabels2);
 
     QStringList hlabels2;
     hlabels2 << "pre" << "now" << "next";
@@ -133,7 +134,7 @@ void MainWindow::InitialTableDisplay()
         }
     }
 
-    ui->tableWidget_Memory->setAlternatingRowColors(true);
+    //ui->tableWidget_Memory->setAlternatingRowColors(true);
 
 }
 

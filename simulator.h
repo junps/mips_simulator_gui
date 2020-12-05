@@ -52,9 +52,9 @@ public:
     Small_simu *boss;
     Small_simu *now_node;
     int siz;
-    int mx_siz = 10000;
+    int mx_siz = 100;
     int ini_sp = 0;
-    int stack_size = 4096;
+    int stack_size = 1024 * 256;
 
     Small_simu *create_initial() {
         Small_simu* small_simu = (Small_simu*)malloc(sizeof(Small_simu));
