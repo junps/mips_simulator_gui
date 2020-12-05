@@ -302,6 +302,9 @@ void MainWindow::update_memory_table()
 
     for(int i = 0; i <= l_lis.stack_size; i++) {
         if(l_lis.now_node->prev->stack[i] != l_lis.now_node->stack[i]) {
+            ui->tableWidget_Memory->setCurrentItem(ui->tableWidget_Memory->item(i, 1));
+            ui->tableWidget_Memory->scrollToItem(ui->tableWidget_Memory->currentItem());
+
             ui->tableWidget_Memory->item(i, 0)->setBackground(Qt::red);
             ui->tableWidget_Memory->item(i, 1)->setBackground(Qt::green);
         }

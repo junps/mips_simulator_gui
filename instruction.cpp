@@ -169,6 +169,12 @@ static void jal(Simulator* simu) {
     simu->pc = (simu->pc & 0xf0000000) | (addr << 2);
 }
 
+static void jalr(Simulator* simu) {
+    uint32_t rs = get_rs(simu);
+    simu->registers[31] = simu->pc + 4;
+    simu->pc = simu->registers[rs];
+}
+
 static void in_f(Simulator* simu) {
     uint32_t rt = get_rt(simu);
     simu->registers[rt] = ((simu->registers[rt] >> 8) << 8) | 0b1010;
@@ -412,6 +418,7 @@ void init_instructions(void) {
     set_inst(0b000010, dummybit, dmfmt, 1, &j);
     set_inst(0b000000, 0b001000, dmfmt, 0, &jr);
     set_inst(0b000011, dummybit, dmfmt, 1, &jal);
+    set_inst(0b000000, 0b001001, dmfmt, 0, &jalr);
     set_inst(0b011010, dummybit, dmfmt, 1, &in_f);
     set_inst(0b011011, dummybit, dmfmt, 1, &out_f);
 
