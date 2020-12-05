@@ -232,11 +232,14 @@ void add_s(Simulator* simu) {
     uint32_t ft = get_rt(simu);
     uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
 
+#if NOT_FPU
+    simu->registers_f[fd] = simu->registers_f[fs] + simu->registers_f[ft];
+#else
     union Single a, b;
     a.f = simu->registers_f[fs];
     b.f = simu->registers_f[ft];
     simu->registers_f[fd] = fadd(a, b).f;
-    //simu->registers_f[fd] = simu->registers_f[fs] + simu->registers_f[ft];
+#endif
     simu->pc += 4;
 }
 
@@ -245,11 +248,14 @@ void sub_s(Simulator* simu) {
     uint32_t ft = get_rt(simu);
     uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
 
+#if NOT_FPU
+    simu->registers_f[fd] = simu->registers_f[fs] - simu->registers_f[ft];
+#else
     union Single a, b;
     a.f = simu->registers_f[fs];
     b.f = simu->registers_f[ft];
     simu->registers_f[fd] = fsub(a, b).f;
-    //simu->registers_f[fd] = simu->registers_f[fs] - simu->registers_f[ft];
+#endif
     simu->pc += 4;
 }
 
@@ -258,11 +264,14 @@ void mul_s(Simulator* simu) {
     uint32_t ft = get_rt(simu);
     uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
 
+#if NOT_FPU
+    simu->registers_f[fd] = simu->registers_f[fs] * simu->registers_f[ft];
+#else
     union Single a, b;
     a.f = simu->registers_f[fs];
     b.f = simu->registers_f[ft];
     simu->registers_f[fd] = fmul(a, b).f;
-    //simu->registers_f[fd] = simu->registers_f[fs] * simu->registers_f[ft];
+#endif
     simu->pc += 4;
 }
 
@@ -271,11 +280,14 @@ void div_s(Simulator* simu) {
     uint32_t ft = get_rt(simu);
     uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
 
+#if NOT_FPU
+    simu->registers_f[fd] = simu->registers_f[fs] / simu->registers_f[ft];
+#else
     union Single a, b;
     a.f = simu->registers_f[fs];
     b.f = simu->registers_f[ft];
     simu->registers_f[fd] = fdiv(a, b).f;
-    //simu->registers_f[fd] = simu->registers_f[fs] / simu->registers_f[ft];
+#endif
     simu->pc += 4;
 }
 
@@ -304,10 +316,13 @@ void sqrt_s(Simulator* simu) {
     uint32_t ft = get_rt(simu);
     uint32_t fd = ((get_imm(simu) >> 6) & 0b11111);
 
+#if NOT_FPU
+    simu->registers_f[fd] = sqrt(simu->registers_f[ft]);
+#else
     union Single a;
     a.f = simu->registers_f[ft];
     simu->registers_f[fd] = fsqrt(a).f;
-    //simu->registers_f[fd] = sqrt(simu->registers_f[ft]);
+#endif
     simu->pc += 4;
 }
 
