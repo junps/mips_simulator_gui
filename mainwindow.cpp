@@ -52,6 +52,66 @@ void destroy_simu(Simulator* simu) {
     free(simu);
 }
 
+void MainWindow::open_inst_file(QString inst_file) {
+    file_name = inst_file;
+
+    string file_name_std = file_name.toStdString();
+
+    int n = file_name_std.size();
+    string base_name = file_name_std.substr(0, n - 9);
+    string data_name = base_name + "data.mem";
+    string debug_name = base_name + "debug.txt";
+
+    data_file = QString::fromStdString(data_name);
+    QString debug_file = QString::fromStdString(debug_name);
+
+    displayFile(debug_file);
+
+    QFile file(file_name);
+    if(!file.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"title","cannot open the file");
+    }
+    QTextStream in(&file);
+    QString input_text = in.readLine();
+    int cnt = 0;
+    char *buf;
+    buf = (char *)calloc(1024, sizeof(char));
+    while(!input_text.isNull()) {
+        buf = input_text.toUtf8().data();
+        uint32_t num = (uint32_t)strtol(buf, NULL, 2);
+        simu->text_field[cnt] = (uint8_t)(num >> 24);
+        simu->text_field[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->text_field[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->text_field[cnt + 3] = (uint8_t)(num & (0b11111111));
+        input_text = in.readLine(256);
+        cnt += 4;
+    }
+    file.close();
+
+    QFile file_d(data_file);
+    if(!file_d.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"title","cannot open the file");
+    }
+    QTextStream in_d(&file_d);
+    QString input_text_d = in_d.readLine();
+    int cnt_d = 0;
+    char *buf_d;
+    buf_d = (char *)calloc(1024, sizeof(char));
+
+    while(!input_text_d.isNull()) {
+        buf_d = input_text_d.toUtf8().data();
+        uint32_t num = (uint32_t)strtol(buf_d, NULL, 2);
+        simu->stack_field[cnt_d] = (uint8_t)(num >> 24);
+        simu->stack_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->stack_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->stack_field[cnt_d + 3] = (uint8_t)(num & (0b11111111));
+        input_text_d = in_d.readLine(256);
+        cnt_d += 4;
+    }
+    display_last_stacks(simu);
+    file_d.close();
+}
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -76,6 +136,10 @@ MainWindow::MainWindow(QWidget *parent)
     QByteArray ba = arg_list[1].toLocal8Bit();
     const char* sld_file = ba.data();
     load_sld_file(sld_file);
+
+    if(arg_list.size() == 4) {
+        open_inst_file(arg_list[2]);
+    }
 
 }
 
