@@ -148,7 +148,12 @@ void MainWindow::update_register_table()
     // now_node
     for(int i = 0; i < 32; i++) {
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(l_lis.now_node->registers[i], 16));
+        char* x;
+        x = (char*)malloc(sizeof(char*) * 8);
+        sprintf(x, "%8x", l_lis.now_node->registers[i]);
+        item->setText(QString(x));
+        free(x);
+        //item->setText(QString::number(l_lis.now_node->registers[i], 16));
         ui->tableWidget_Registers->setItem(i, 1, item);
     }
 
@@ -156,12 +161,22 @@ void MainWindow::update_register_table()
         union { float f; int i; } f_and_i;
         f_and_i.f = l_lis.now_node->registers_f[j];
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(f_and_i.i, 16));
+        char* x;
+        x = (char*)malloc(sizeof(char*) * 8);
+        sprintf(x, "%8x", f_and_i.i);
+        item->setText(QString(x));
+        free(x);
+        //item->setText(QString::number(f_and_i.i, 16));
         ui->tableWidget_Registers->setItem(j + 32, 1, item);
     }
 
     QTableWidgetItem *item1 = new QTableWidgetItem;
-    item1->setText(QString::number(l_lis.now_node->pc, 16));
+    char* x1;
+    x1 = (char*)malloc(sizeof(char*) * 8);
+    sprintf(x1, "%8x", l_lis.now_node->pc);
+    item1->setText(QString(x1));
+    free(x1);
+    //item1->setText(QString::number(l_lis.now_node->pc, 16));
     ui->tableWidget_Registers->setItem(64, 1, item1);
 
     for(int i = 0; i < 8; i++) {
@@ -174,7 +189,12 @@ void MainWindow::update_register_table()
     if(l_lis.now_node == l_lis.boss) {
         for(int i = 0; i < 32; i++) {
             QTableWidgetItem *item = new QTableWidgetItem;
-            item->setText(QString::number(l_lis.now_node->registers[i], 16));
+            char* x;
+            x = (char*)malloc(sizeof(char*) * 8);
+            sprintf(x, "%8x", l_lis.now_node->registers[i]);
+            item->setText(QString(x));
+            free(x);
+            //item->setText(QString::number(l_lis.now_node->registers[i], 16));
             ui->tableWidget_Registers->setItem(i, 0, item);
         }
 
@@ -182,12 +202,22 @@ void MainWindow::update_register_table()
             union { float f; int i; } f_and_i;
             f_and_i.f = l_lis.now_node->registers_f[j];
             QTableWidgetItem *item = new QTableWidgetItem;
-            item->setText(QString::number(f_and_i.i, 16));
+            char* x;
+            x = (char*)malloc(sizeof(char*) * 8);
+            sprintf(x, "%8x", f_and_i.i);
+            item->setText(QString(x));
+            free(x);
+            //item->setText(QString::number(f_and_i.i, 16));
             ui->tableWidget_Registers->setItem(j + 32, 0, item);
         }
 
         QTableWidgetItem *item0 = new QTableWidgetItem;
-        item0->setText(QString::number(l_lis.now_node->pc, 16));
+        char* x0;
+        x0 = (char*)malloc(sizeof(char*) * 8);
+        sprintf(x0, "%8x", l_lis.now_node->pc);
+        item0->setText(QString(x0));
+        free(x0);
+        //item0->setText(QString::number(l_lis.now_node->pc, 16));
         ui->tableWidget_Registers->setItem(64, 0, item0);
 
         for(int i = 0; i < 8; i++) {
@@ -198,7 +228,12 @@ void MainWindow::update_register_table()
     } else {
         for(int i = 0; i < 32; i++) {
             QTableWidgetItem *item = new QTableWidgetItem;
-            item->setText(QString::number(l_lis.now_node->prev->registers[i], 16));
+            char* x;
+            x = (char*)malloc(sizeof(char*) * 8);
+            sprintf(x, "%8x", l_lis.now_node->prev->registers[i]);
+            item->setText(QString(x));
+            free(x);
+            //item->setText(QString::number(l_lis.now_node->prev->registers[i], 16));
             ui->tableWidget_Registers->setItem(i, 0, item);
         }
 
@@ -206,12 +241,22 @@ void MainWindow::update_register_table()
             union { float f; int i; } f_and_i;
             f_and_i.f = l_lis.now_node->prev->registers_f[j];
             QTableWidgetItem *item = new QTableWidgetItem;
-            item->setText(QString::number(f_and_i.i, 16));
+            char* x;
+            x = (char*)malloc(sizeof(char*) * 8);
+            sprintf(x, "%8x", f_and_i.i);
+            item->setText(QString(x));
+            free(x);
+            //item->setText(QString::number(f_and_i.i, 16));
             ui->tableWidget_Registers->setItem(j + 32, 0, item);
         }
 
         QTableWidgetItem *item0 = new QTableWidgetItem;
-        item0->setText(QString::number(l_lis.now_node->prev->pc, 16));
+        char* x0;
+        x0 = (char*)malloc(sizeof(char*) * 8);
+        sprintf(x0, "%8x", l_lis.now_node->prev->pc);
+        item0->setText(QString(x0));
+        free(x0);
+        //item0->setText(QString::number(l_lis.now_node->prev->pc, 16));
         ui->tableWidget_Registers->setItem(64, 0, item0);
 
         for(int i = 0; i < 8; i++) {
@@ -225,7 +270,12 @@ void MainWindow::update_register_table()
     //now_node->next
     for(int i = 0; i < 32; i++) {
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(l_lis.now_node->next->registers[i], 16));
+        char* x;
+        x = (char*)malloc(sizeof(char*) * 8);
+        sprintf(x, "%8x", l_lis.now_node->registers[i]);
+        item->setText(QString(x));
+        free(x);
+        //item->setText(QString::number(l_lis.now_node->next->registers[i], 16));
         ui->tableWidget_Registers->setItem(i, 2, item);
     }
 
@@ -233,12 +283,22 @@ void MainWindow::update_register_table()
         union { float f; int i; } f_and_i;
         f_and_i.f = l_lis.now_node->next->registers_f[j];
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(f_and_i.i, 16));
+        char* x;
+        x = (char*)malloc(sizeof(char*) * 8);
+        sprintf(x, "%8x", f_and_i.i);
+        item->setText(QString(x));
+        free(x);
+        //item->setText(QString::number(f_and_i.i, 16));
         ui->tableWidget_Registers->setItem(j + 32, 2, item);
     }
 
     QTableWidgetItem *item2 = new QTableWidgetItem;
-    item2->setText(QString::number(l_lis.now_node->next->pc, 16));
+    char* x2;
+    x2 = (char*)malloc(sizeof(char*) * 8);
+    sprintf(x2, "%8x", l_lis.now_node->next->pc);
+    item2->setText(QString(x2));
+    free(x2);
+    //item2->setText(QString::number(l_lis.now_node->next->pc, 16));
     ui->tableWidget_Registers->setItem(64, 2, item2);
 
     for(int i = 0; i < 8; i++) {
@@ -279,7 +339,12 @@ void MainWindow::update_memory_table()
     // now_node
     for(int i = 0; i <= l_lis.stack_size; i++) {
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(l_lis.now_node->stack[i], 16));
+        char* x;
+        x = (char*)malloc(sizeof(char*) * 2);
+        sprintf(x, "%8x", l_lis.now_node->stack[i]);
+        item->setText(QString(x));
+        free(x);
+        //item->setText(QString::number(l_lis.now_node->stack[i], 16));
         ui->tableWidget_Memory->setItem(i, 1, item);
     }
 
@@ -287,13 +352,23 @@ void MainWindow::update_memory_table()
     if(l_lis.now_node == l_lis.boss) {
         for(int i = 0; i <= l_lis.stack_size; i++) {
             QTableWidgetItem *item = new QTableWidgetItem;
-            item->setText(QString::number(l_lis.now_node->stack[i], 16));
+            char* x;
+            x = (char*)malloc(sizeof(char*) * 2);
+            sprintf(x, "%8x", l_lis.now_node->stack[i]);
+            item->setText(QString(x));
+            free(x);
+            //item->setText(QString::number(l_lis.now_node->stack[i], 16));
             ui->tableWidget_Memory->setItem(i, 0, item);
         }
     } else {
         for(int i = 0; i <= l_lis.stack_size; i++) {
             QTableWidgetItem *item = new QTableWidgetItem;
-            item->setText(QString::number(l_lis.now_node->prev->stack[i], 16));
+            char* x;
+            x = (char*)malloc(sizeof(char*) * 2);
+            sprintf(x, "%8x", l_lis.now_node->prev->stack[i]);
+            item->setText(QString(x));
+            free(x);
+            //item->setText(QString::number(l_lis.now_node->prev->stack[i], 16));
             ui->tableWidget_Memory->setItem(i, 0, item);
         }
     }
@@ -301,7 +376,12 @@ void MainWindow::update_memory_table()
     //now_node->next
     for(int i = 0; i <= l_lis.stack_size; i++) {
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(l_lis.now_node->next->stack[i], 16));
+        char* x;
+        x = (char*)malloc(sizeof(char*) * 2);
+        sprintf(x, "%8x", l_lis.now_node->next->stack[i]);
+        item->setText(QString(x));
+        free(x);
+        //item->setText(QString::number(l_lis.now_node->next->stack[i], 16));
         ui->tableWidget_Memory->setItem(i, 2, item);
     }
 
@@ -367,9 +447,38 @@ void MainWindow::back_simu(Small_simu *small_simu)
 void MainWindow::display_last_register(Simulator *simu)
 {
     // now_node
+//    for(int i = 0; i < 32; i++) {
+//        QTableWidgetItem *item = new QTableWidgetItem;
+//        item->setText(QString::number(simu->registers[i], 16));
+//        ui->tableWidget_Registers->setItem(i, 1, item);
+//    }
+
+//    for(int j = 0; j < 32; j++) {
+//        union { float f; int i; } f_and_i;
+//        f_and_i.f = simu->registers_f[j];
+//        QTableWidgetItem *item = new QTableWidgetItem;
+//        item->setText(QString::number(f_and_i.i, 16));
+//        ui->tableWidget_Registers->setItem(j + 32, 1, item);
+//    }
+//    QTableWidgetItem *item1 = new QTableWidgetItem;
+//    item1->setText(QString::number(simu->pc, 16));
+//    ui->tableWidget_Registers->setItem(64, 1, item1);
+
+//    for(int i = 0; i < 8; i++) {
+//        QTableWidgetItem *item = new QTableWidgetItem;
+//        item->setText(QString::number(simu->condition_code[i], 16));
+//        ui->tableWidget_Registers->setItem(i + 65, 1, item);
+//    }
+
+    // now_node
     for(int i = 0; i < 32; i++) {
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(simu->registers[i], 16));
+        char* x;
+        x = (char*)malloc(sizeof(char*) * 8);
+        sprintf(x, "%8x", simu->registers[i]);
+        item->setText(QString(x));
+        free(x);
+        //item->setText(QString::number(l_lis.now_node->registers[i], 16));
         ui->tableWidget_Registers->setItem(i, 1, item);
     }
 
@@ -377,11 +486,22 @@ void MainWindow::display_last_register(Simulator *simu)
         union { float f; int i; } f_and_i;
         f_and_i.f = simu->registers_f[j];
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(f_and_i.i, 16));
+        char* x;
+        x = (char*)malloc(sizeof(char*) * 8);
+        sprintf(x, "%8x", f_and_i.i);
+        item->setText(QString(x));
+        free(x);
+        //item->setText(QString::number(f_and_i.i, 16));
         ui->tableWidget_Registers->setItem(j + 32, 1, item);
     }
+
     QTableWidgetItem *item1 = new QTableWidgetItem;
-    item1->setText(QString::number(simu->pc, 16));
+    char* x1;
+    x1 = (char*)malloc(sizeof(char*) * 8);
+    sprintf(x1, "%8x", simu->pc);
+    item1->setText(QString(x1));
+    free(x1);
+    //item1->setText(QString::number(l_lis.now_node->pc, 16));
     ui->tableWidget_Registers->setItem(64, 1, item1);
 
     for(int i = 0; i < 8; i++) {
@@ -396,7 +516,12 @@ void MainWindow::display_last_stacks(Simulator *simu)
     // now_node
     for(int i = 0; i <= l_lis.stack_size; i++) {
         QTableWidgetItem *item = new QTableWidgetItem;
-        item->setText(QString::number(simu->stack_field[i], 16));
+        char* x;
+        x = (char*)malloc(sizeof(char*) * 2);
+        sprintf(x, "%8x", simu->stack_field[i]);
+        item->setText(QString(x));
+        free(x);
+        //item->setText(QString::number(simu->stack_field[i], 16));
         ui->tableWidget_Memory->setItem(i, 1, item);
     }
 }

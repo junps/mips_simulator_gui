@@ -14,10 +14,10 @@ unsigned sld_index = 0;
 int main(int argc, char *argv[])
 {
     if(argc == 3) { //no_gui
-        string file_path = argv[1];
+        string file_path = argv[2];
         QString file_name = QString::fromStdString(file_path);
         //qDebug() << file_name;
-        exec_all(file_name);
+        exec_all(file_name, argv[1]);
         return 0;
     } else { //gui
         QApplication a(argc, argv);

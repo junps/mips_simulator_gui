@@ -23,7 +23,7 @@ Simulator* create_simu_(size_t text_size, size_t stack_size, uint32_t pc, uint32
     return simu;
 }
 
-void exec_all(QString file_name) {
+void exec_all(QString file_name, char* sld_file) {
     string file_name_std = file_name.toStdString();
 
     int n = file_name_std.size();
@@ -46,6 +46,8 @@ void exec_all(QString file_name) {
 
     Simulator* simu;
     remove("output.txt");
+
+    load_sld_file(sld_file);
 
     init_instructions();
 

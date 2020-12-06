@@ -7,6 +7,6 @@
 
 #include <string.h>
 
-void exec_all(QString file_name);
+void exec_all(QString file_name, char* sld_file);
 
 #endif // NO_GUI_H
