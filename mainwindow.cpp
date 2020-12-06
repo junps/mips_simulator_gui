@@ -844,4 +844,7 @@ void MainWindow::on_pushButton_StopAt_released()
     heigh_light_row(simu->pc / 4);
     display_last_register(simu);
     display_last_stacks(simu);
+    l_lis.delete_whole_l();
+    l_lis.create_new(simu);
+    l_lis.siz++;
 }
