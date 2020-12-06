@@ -49,8 +49,8 @@ static void lw(Simulator* simu) {
 
 static void lui(Simulator* simu) {
     uint32_t rt = get_rt(simu);
-    int32_t imm = get_imm(simu);
-    int32_t num = imm << 16;
+    uint32_t imm = get_uimm(simu);
+    uint32_t num = imm << 16;
     simu->registers[rt] = num;
     simu->pc += 4;
 }
@@ -74,7 +74,7 @@ static void and_f(Simulator* simu) {
 static void ori(Simulator* simu) {
     uint32_t rs = get_rs(simu);
     uint32_t rt = get_rt(simu);
-    int32_t imm = get_imm(simu);
+    uint32_t imm = get_uimm(simu);
     simu->registers[rt] = imm | (simu->registers[rs]);
     simu->pc += 4;
 }
@@ -82,7 +82,7 @@ static void ori(Simulator* simu) {
 static void andi(Simulator* simu) {
     uint32_t rs = get_rs(simu);
     uint32_t rt = get_rt(simu);
-    int32_t imm = get_imm(simu);
+    uint32_t imm = get_uimm(simu);
     simu->registers[rt] = imm & (simu->registers[rs]);
     simu->pc += 4;
 }
@@ -351,14 +351,18 @@ void sw_s(Simulator* simu) {
 void ftoi(Simulator* simu) {
     uint32_t fs = get_rs(simu);
     uint32_t rt = get_rt(simu);
-    simu->registers[rt] = (int)simu->registers_f[fs];
+    union { float f; int i; } f_and_i;
+    f_and_i.f = simu->registers_f[fs];
+    simu->registers[rt] = f_and_i.i;
     simu->pc += 4;
 }
 
 void itof(Simulator* simu) {
     uint32_t rs = get_rs(simu);
     uint32_t ft = get_rt(simu);
-    simu->registers_f[ft] = (float)simu->registers[rs];
+    union { float f; int i; } f_and_i;
+    f_and_i.i = simu->registers[rs];
+    simu->registers_f[ft] = f_and_i.f;
     simu->pc += 4;
 }
 

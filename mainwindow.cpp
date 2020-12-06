@@ -741,6 +741,8 @@ void MainWindow::on_pushButton_All_released()
             exit(1);
         }
 
+        qDebug() << num_instructions;
+
         instructions[opcode][funct][fmt](simu);
         num_instructions++;
     }
@@ -804,4 +806,42 @@ void MainWindow::on_pushButton_Nbp_released()
     heigh_light_row(simu->pc / 4);
     update_register_table();
     update_memory_table();
+}
+
+void MainWindow::on_spinBox_StopAt_valueChanged(int arg1)
+{
+    stop_at = arg1;
+}
+
+void MainWindow::on_pushButton_StopAt_released()
+{
+    long long int pre_pc = -1, cnt_inst = 0;
+
+    while(1) {
+        uint32_t opcode = get_opcode(simu);
+        uint32_t funct = get_func(simu);
+        uint32_t fmt = get_fmt(simu);
+
+//        printf("opcode : %d, funct : %d\n", opcode, funct);
+
+        if(opcode == 0b111111) break;
+
+        if (instructions[opcode][funct][fmt] == NULL) {
+            printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+            printf("pc is %d\n", simu->pc / 4);
+            exit(1);
+        }
+
+        if(pre_pc == simu->pc) break;
+        pre_pc = simu->pc;
+
+        if(cnt_inst == stop_at) break;
+
+        instructions[opcode][funct][fmt](simu);
+
+        cnt_inst++;
+    }
+    heigh_light_row(simu->pc / 4);
+    display_last_register(simu);
+    display_last_stacks(simu);
 }

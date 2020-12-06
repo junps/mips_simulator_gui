@@ -46,6 +46,10 @@ private slots:
 
     void on_pushButton_Nbp_released();
 
+    void on_spinBox_StopAt_valueChanged(int arg1);
+
+    void on_pushButton_StopAt_released();
+
 private:
     Ui::MainWindow *ui;
 
@@ -60,6 +64,8 @@ private:
     long long int next_step = 1;
 
     long long int next_break_point = 0;
+
+    long long int stop_at = 0;
 
     QString file_name;
 
