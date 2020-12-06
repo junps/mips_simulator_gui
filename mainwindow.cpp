@@ -72,6 +72,11 @@ MainWindow::MainWindow(QWidget *parent)
 //        ui->tableWidget_Memory->setRowHeight(i, 27);
 //    }
 
+    QStringList arg_list = QApplication::arguments();
+    QByteArray ba = arg_list[1].toLocal8Bit();
+    const char* sld_file = ba.data();
+    load_sld_file(sld_file);
+
 }
 
 MainWindow::~MainWindow()

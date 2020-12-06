@@ -177,7 +177,8 @@ static void jalr(Simulator* simu) {
 
 static void in_f(Simulator* simu) {
     uint32_t rt = get_rt(simu);
-    simu->registers[rt] = ((simu->registers[rt] >> 8) << 8) | 0b1010;
+    //simu->registers[rt] = ((simu->registers[rt] >> 8) << 8) | 0b1010;
+    simu->registers[rt] = read_a_sld_word().i;
     simu->pc += 4;
 }
 
@@ -196,7 +197,7 @@ static void in_f(Simulator* simu) {
 static void out_f(Simulator* simu) {
     uint32_t rt = get_rt(simu);
     char buf[100];
-    sprintf(buf, "%d", simu->registers[rt]);
+    sprintf(buf, "%c", simu->registers[rt]);
     //fwrite(buf, 2, sizeof(char), fp_out);
     //fputc('\n', fp_out);
 

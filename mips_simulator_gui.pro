@@ -10,6 +10,7 @@ CONFIG += c++11
 
 SOURCES += \
     instruction.cpp \
+    io.cpp \
     main.cpp \
     mainwindow.cpp \
     no_gui.cpp \
@@ -17,6 +18,7 @@ SOURCES += \
 
 HEADERS += \
     instruction.h \
+    io.h \
     mainwindow.h \
     no_gui.h \
     simu_functions.h \

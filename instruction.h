@@ -5,6 +5,7 @@
 #include <QFileDialog>
 
 #include "simulator.h"
+#include "io.h"
 
 void init_instructions(void);
 
