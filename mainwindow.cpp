@@ -759,7 +759,7 @@ void MainWindow::on_spinBox_Nbp_valueChanged(int arg1)
 
 void MainWindow::on_pushButton_Nbp_released()
 {
-    long long int pre_pc = -1;
+    long long int pre_pc = -1, num_instructions = 0;
 
     bool same = false;
     if(next_break_point == simu->pc) same = true;
@@ -779,6 +779,8 @@ void MainWindow::on_pushButton_Nbp_released()
             exit(1);
         }
 
+        qDebug() << num_instructions;
+
         if(pre_pc == simu->pc) break;
         pre_pc = simu->pc;
 
@@ -787,25 +789,15 @@ void MainWindow::on_pushButton_Nbp_released()
 
         instructions[opcode][funct][fmt](simu);
 
+        num_instructions++;
 
-        if(l_lis.now_node->next == l_lis.boss) {
-            l_lis.create_new(simu);
-            l_lis.siz++;
-            if(l_lis.siz > l_lis.mx_siz) {
-                l_lis.boss->next = l_lis.boss->next->next;
-                free(l_lis.boss->next->prev->stack);
-                free(l_lis.boss->next->prev);
-                l_lis.boss->next->prev = l_lis.boss;
-                l_lis.siz--;
-            }
-        } else {
-            l_lis.now_node = l_lis.now_node->next;
-            l_lis.change_simu(simu);
-        }
     }
     heigh_light_row(simu->pc / 4);
-    update_register_table();
-    update_memory_table();
+    display_last_register(simu);
+    display_last_stacks(simu);
+    l_lis.delete_whole_l();
+    l_lis.create_new(simu);
+    l_lis.siz++;
 }
 
 void MainWindow::on_spinBox_StopAt_valueChanged(int arg1)
