@@ -119,7 +119,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     InitialTableDisplay();
 
-    remove("output.txt");
+    remove("output.ppm");
 
     init_instructions();
 

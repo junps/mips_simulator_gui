@@ -11,7 +11,7 @@
 
 instruction_func_t* instructions[64][64][8];
 
-QString output_file = "output.txt";
+QString output_file = "output.ppm";
 QFile file(output_file);
 
 void add(Simulator* simu) {
