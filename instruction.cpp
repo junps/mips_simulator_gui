@@ -354,11 +354,14 @@ void ftoi(Simulator* simu) {
 //    union { float f; int i; } f_and_i;
 //    f_and_i.f = simu->registers_f[fs];
 //    simu->registers[rt] = f_and_i.i;
-    int num = (int)simu->registers_f[fs];
-    if(simu->registers_f[fs] - num >= 0.5) {
-        num++;
+    int i_num;
+    float f_num = simu->registers_f[fs];
+    if(f_num >= 0) {
+        i_num = (int)(f_num + 0.5);
+    } else {
+        i_num = (int)(f_num - 0.5);
     }
-    simu->registers[rt] = num;
+    simu->registers[rt] = i_num;
     simu->pc += 4;
 }
 
