@@ -351,18 +351,20 @@ void sw_s(Simulator* simu) {
 void ftoi(Simulator* simu) {
     uint32_t fs = get_rs(simu);
     uint32_t rt = get_rt(simu);
-    union { float f; int i; } f_and_i;
-    f_and_i.f = simu->registers_f[fs];
-    simu->registers[rt] = f_and_i.i;
+//    union { float f; int i; } f_and_i;
+//    f_and_i.f = simu->registers_f[fs];
+//    simu->registers[rt] = f_and_i.i;
+    simu->registers[rt] = (int)simu->registers_f[fs];
     simu->pc += 4;
 }
 
 void itof(Simulator* simu) {
     uint32_t rs = get_rs(simu);
     uint32_t ft = get_rt(simu);
-    union { float f; int i; } f_and_i;
-    f_and_i.i = simu->registers[rs];
-    simu->registers_f[ft] = f_and_i.f;
+//    union { float f; int i; } f_and_i;
+//    f_and_i.i = simu->registers[rs];
+//    simu->registers_f[ft] = f_and_i.f;
+    simu->registers_f[ft] = (float)simu->registers[rs];
     simu->pc += 4;
 }
 

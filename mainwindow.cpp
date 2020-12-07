@@ -805,7 +805,7 @@ void MainWindow::on_pushButton_All_released()
             exit(1);
         }
 
-        qDebug() << num_instructions;
+        //qDebug() << num_instructions;
 
         instructions[opcode][funct][fmt](simu);
         num_instructions++;
@@ -813,7 +813,7 @@ void MainWindow::on_pushButton_All_released()
     heigh_light_row(simu->pc / 4);
     display_last_register(simu);
     display_last_stacks(simu);
-    qDebug() << "num_insructions" << num_instructions;
+    qDebug() << "num_insructions " << num_instructions;
 }
 
 void MainWindow::on_spinBox_Nbp_valueChanged(int arg1)
