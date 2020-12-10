@@ -817,7 +817,7 @@ void MainWindow::on_pushButton_All_released()
 
         //qDebug() << num_instructions;
 
-        visited[simu->pc / 4] = 1;
+        //visited[simu->pc / 4] = 1;
 
         instructions[opcode][funct][fmt](simu);
         num_instructions++;
