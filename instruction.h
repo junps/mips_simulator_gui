@@ -13,6 +13,4 @@ typedef void instruction_func_t(Simulator*);
 
 extern instruction_func_t* instructions[64][64][8];
 
-extern FILE *fp_out;
-
 #endif // INSTRUCTION_H

@@ -45,7 +45,7 @@ void exec_all(QString file_name, char* sld_file) {
     buf = (char *)calloc(1024, sizeof(char));
 
     Simulator* simu;
-    remove("output.txt");
+    remove("output.ppm");
 
     load_sld_file(sld_file);
 

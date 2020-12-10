@@ -20,6 +20,8 @@ using namespace std;
 #define MEMORY_SIZE (2000000)
 #define STACK_SIZE (1024 * 1024)
 
+//extern FILE *fp_out;
+
 string registers_name[] = { "ZERO", "AT", "V0", "V1", "A0", "A1", "A2", "A3", "T0", "T1",
                             "T2", "T3", "T4", "T5", "T6", "T7", "S0", "S1", "S2", "S3", "S4",
                             "S5", "S6", "S7", "T8", "T9", "K0", "K1", "GP", "SP", "FP", "RA" };
@@ -120,6 +122,11 @@ MainWindow::MainWindow(QWidget *parent)
     InitialTableDisplay();
 
     remove("output.ppm");
+
+//    if((fp_out = fopen("output.txt", "w")) == NULL) {
+//        printf("error");
+//        exit(1);
+//    }
 
     init_instructions();
 
@@ -784,10 +791,13 @@ void MainWindow::on_pushButton_Back_released()
     }
 }
 
+//int visited[12253];
+
 void MainWindow::on_pushButton_All_released()
 {
     long long int num_instructions = 0;
     uint32_t pre_pc = -1;
+
     while(1) {
         uint32_t opcode = get_opcode(simu);
         uint32_t funct = get_func(simu);
@@ -807,6 +817,8 @@ void MainWindow::on_pushButton_All_released()
 
         //qDebug() << num_instructions;
 
+        visited[simu->pc / 4] = 1;
+
         instructions[opcode][funct][fmt](simu);
         num_instructions++;
     }
@@ -814,6 +826,12 @@ void MainWindow::on_pushButton_All_released()
     display_last_register(simu);
     display_last_stacks(simu);
     qDebug() << "num_insructions " << num_instructions;
+
+//    for (int i = 0; i < 12253; i++) {
+//        if(visited[i] == 0) {
+//            qDebug() << i;
+//        }
+//    }
 }
 
 void MainWindow::on_spinBox_Nbp_valueChanged(int arg1)

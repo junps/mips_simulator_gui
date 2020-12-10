@@ -11,8 +11,10 @@
 
 instruction_func_t* instructions[64][64][8];
 
-QString output_file = "output.ppm";
-QFile file(output_file);
+//QString output_file = "output.ppm";
+//QFile file(output_file);
+
+FILE *fp_out;
 
 void add(Simulator* simu) {
     uint32_t rs = get_rs(simu);
@@ -182,27 +184,10 @@ static void in_f(Simulator* simu) {
     simu->pc += 4;
 }
 
-//static void out_f(Simulator* simu) {
-//    uint32_t rt = get_rt(simu);
-//    char buf[100];
-//    sprintf(buf, "%x", (simu->registers[rt] & 0xff));
-//    //fwrite(buf, 2, sizeof(char), fp_out);
-//    //fputc('\n', fp_out);
-
-//    QTextStream out(&file);
-//    out << buf;
-//    simu->pc += 4;
-//}
-
 static void out_f(Simulator* simu) {
     uint32_t rt = get_rt(simu);
-    char buf[100];
-    sprintf(buf, "%c", simu->registers[rt]);
-    //fwrite(buf, 2, sizeof(char), fp_out);
-    //fputc('\n', fp_out);
+    fwrite((char*)&(simu->registers[rt]), 1, 1, fp_out);
 
-    QTextStream out(&file);
-    out << buf;
     simu->pc += 4;
 }
 
@@ -482,8 +467,13 @@ void init_instructions(void) {
     set_inst(0b110000, dummybit, dmfmt, 1, &itof);
 
 
-    if (!file.open(QIODevice::WriteOnly)) {
-        qDebug() << "cannot open output.txt";
-        return;
+//    if (!file.open(QIODevice::WriteOnly)) {
+//        qDebug() << "cannot open output.txt";
+//        return;
+//    }
+
+    if((fp_out = fopen("output.ppm", "w")) == NULL) {
+        printf("error");
+        exit(1);
     }
 }

@@ -1,6 +1,0 @@
-    .globl start
-start:
-    in $v1
-    sll $v0, $v1, 2
-    srl $v0, $v0, 1
-    out $v0
