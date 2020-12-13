@@ -795,6 +795,7 @@ void MainWindow::on_pushButton_Back_released()
 
 void MainWindow::on_pushButton_All_released()
 {
+
     long long int num_instructions = 0;
     uint32_t pre_pc = -1;
 
@@ -815,11 +816,16 @@ void MainWindow::on_pushButton_All_released()
             exit(1);
         }
 
-        //qDebug() << num_instructions;
+#if DEBUG
+        if(num_instructions % 100 == 0) {
+            qDebug() << num_instructions;
+        }
+#endif
 
         //visited[simu->pc / 4] = 1;
 
         instructions[opcode][funct][fmt](simu);
+
         num_instructions++;
     }
     heigh_light_row(simu->pc / 4);
