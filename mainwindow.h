@@ -50,6 +50,10 @@ private slots:
 
     void on_pushButton_StopAt_released();
 
+    void on_pushButton_SwStop_released();
+
+    void on_spinBox_SwStop_valueChanged(int arg1);
+
 private:
     Ui::MainWindow *ui;
 
@@ -66,6 +70,8 @@ private:
     long long int next_break_point = 0;
 
     long long int stop_at = 0;
+
+    long long int sw_stop = 0;
 
     QString file_name;
 

@@ -928,3 +928,45 @@ void MainWindow::on_pushButton_StopAt_released()
     l_lis.create_new(simu);
     l_lis.siz++;
 }
+
+void MainWindow::on_pushButton_SwStop_released()
+{
+    long long int pre_pc = -1;
+
+    while(1) {
+        uint32_t opcode = get_opcode(simu);
+        uint32_t funct = get_func(simu);
+        uint32_t fmt = get_fmt(simu);
+
+
+        if (instructions[opcode][funct][fmt] == NULL) {
+            printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+            printf("pc is %d\n", simu->pc / 4);
+            exit(1);
+        }
+
+        if(pre_pc == simu->pc) break;
+        pre_pc = simu->pc;
+
+        if(opcode == 0b101011) {
+            uint32_t rs = get_rs(simu);
+            int32_t imm = get_imm(simu);
+            if(simu->registers[rs] + imm == sw_stop) {
+                break;
+            }
+        }
+
+        instructions[opcode][funct][fmt](simu);
+
+    }
+    heigh_light_row(simu->pc / 4);
+    display_last_register(simu);
+    display_last_stacks(simu);
+    l_lis.delete_whole_l();
+    l_lis.create_new(simu);
+    l_lis.siz++;
+}
+void MainWindow::on_spinBox_SwStop_valueChanged(int arg1)
+{
+    sw_stop = arg1;
+}

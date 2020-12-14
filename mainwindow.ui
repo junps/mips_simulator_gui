@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>852</width>
+    <width>1056</width>
     <height>600</height>
    </rect>
   </property>
@@ -44,6 +44,20 @@
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinBox_SwStop">
+          <property name="maximum">
+           <number>10000000</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_SwStop">
+          <property name="text">
+           <string>SwStop</string>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QSpinBox" name="spinBox_StopAt">
@@ -136,7 +150,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>852</width>
+     <width>1056</width>
      <height>22</height>
     </rect>
    </property>

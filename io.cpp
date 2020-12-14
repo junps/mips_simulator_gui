@@ -1,5 +1,7 @@
 #include "io.h"
 
+#include <QDebug>
+
 #define MAX_N_WORDS 4096
 extern fi_union sld_words[];
 extern unsigned sld_n_words;

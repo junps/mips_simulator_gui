@@ -187,7 +187,7 @@ static void in_f(Simulator* simu) {
 static void out_f(Simulator* simu) {
     uint32_t rt = get_rt(simu);
     fwrite((char*)&(simu->registers[rt]), 1, 1, fp_out);
-
+    //fwrite((char*)&(simu->registers[rt]), 1, 1, stdout);
     simu->pc += 4;
 }
 
