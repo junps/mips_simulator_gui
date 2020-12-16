@@ -172,3 +172,19 @@ fi_union read_a_sld_word() {
     sld_index += 1;
     return sld_words[sld_index-1];
 }
+
+fi_union read_a_sld_byte() {
+    fi_union ret;
+    switch(sld_index % 4) {
+        case 0:
+            ret.i = sld_words[sld_index / 4].i & 0xff;
+        case 1:
+            ret.i = (sld_words[sld_index / 4].i >> 8) & 0xff;
+        case 2:
+            ret.i = (sld_words[sld_index / 4].i >> 16) & 0xff;
+        case 3:
+            ret.i = (sld_words[sld_index / 4].i >> 24) & 0xff;
+    }
+    sld_index++;
+    return ret;
+}

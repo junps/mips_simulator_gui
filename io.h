@@ -26,6 +26,7 @@ typedef struct{
 
 void load_sld_file(const char* sld_file_name);
 fi_union read_a_sld_word(void);
+fi_union read_a_sld_byte(void);
 
 
 #endif // IO_H

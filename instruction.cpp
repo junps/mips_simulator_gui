@@ -180,15 +180,29 @@ static void jalr(Simulator* simu) {
 static void in_f(Simulator* simu) {
     uint32_t rt = get_rt(simu);
     //simu->registers[rt] = ((simu->registers[rt] >> 8) << 8) | 0b1010;
-    simu->registers[rt] = read_a_sld_word().i;
+    simu->registers[rt] = read_a_sld_byte().i;
     simu->pc += 4;
 }
 
+int fst = 1;
+
 static void out_f(Simulator* simu) {
+#if RAYTRACE
+    if(fst) {
+        fst = 0;
+        simu->pc += 4;
+    } else {
+        uint32_t rt = get_rt(simu);
+        fwrite((char*)&(simu->registers[rt]), 1, 1, fp_out);
+        //fwrite((char*)&(simu->registers[rt]), 1, 1, stdout);
+        simu->pc += 4;
+    }
+#else
     uint32_t rt = get_rt(simu);
     fwrite((char*)&(simu->registers[rt]), 1, 1, fp_out);
     //fwrite((char*)&(simu->registers[rt]), 1, 1, stdout);
     simu->pc += 4;
+#endif
 }
 
 void bt_s(Simulator* simu) {
