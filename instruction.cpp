@@ -374,6 +374,20 @@ void itof(Simulator* simu) {
     simu->pc += 4;
 }
 
+void cadd(Simulator* simu) {
+    uint32_t rs = get_rs(simu);
+    uint32_t ft = get_rt(simu);
+//    union { float f; int i; } f_and_i;
+//    f_and_i.i = simu->registers[rs];
+//    simu->registers_f[ft] = f_and_i.f;
+    int32_t num = ret_32bit(simu, simu->registers[rs]);
+    union { float f; int i; } f_and_i;
+    f_and_i.i = num;
+    f_and_i.f += simu->registers_f[ft];
+    divide_8bits_store(simu, simu->registers[rs], f_and_i.i);
+    simu->pc += 4;
+}
+
 void c_eq_s(Simulator* simu) {
     uint32_t fs = get_rd(simu);
     uint32_t ft = get_rt(simu);
@@ -479,6 +493,7 @@ void init_instructions(void) {
     set_inst(0b111001, dummybit, dmfmt, 1, &sw_s);
     set_inst(0b111000, dummybit, dmfmt, 1, &ftoi);
     set_inst(0b110000, dummybit, dmfmt, 1, &itof);
+    set_inst(0b111100, dummybit, dmfmt, 1, &cadd);
 
 
 //    if (!file.open(QIODevice::WriteOnly)) {
