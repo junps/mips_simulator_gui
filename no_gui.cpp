@@ -2,19 +2,18 @@
 
 #include <QDebug>
 
-#define MEMORY_SIZE (2000000000)
-#define STACK_SIZE (1024 * 1024)
-
-Simulator* create_simu_(size_t text_size, size_t stack_size, uint32_t pc, uint32_t sp) {
+Simulator* create_simu_(uint32_t pc, uint32_t sp) {
     Simulator* simu = (Simulator*)malloc(sizeof(Simulator));
-    simu->text_field = (uint8_t*)malloc(text_size);
-    simu->stack_field = (uint8_t*)malloc(stack_size);
+    simu->text_field = (uint8_t*)malloc(TEXT_SIZE);
+    simu->stack_field = (uint8_t*)malloc(STACK_SIZE);
+    simu->data_field = (uint8_t*)malloc(DATA_SIZE);
 
     memset(simu->registers, 0, sizeof(simu->registers));
     memset(simu->registers_f, 0, sizeof(simu->registers));
     memset(simu->condition_code, 0, sizeof(simu->condition_code));
-    memset(simu->text_field, 0, text_size);
-    memset(simu->stack_field, 0, stack_size);
+    memset(simu->text_field, 0, TEXT_SIZE);
+    memset(simu->data_field, 0, DATA_SIZE);
+    memset(simu->stack_field, 0, STACK_SIZE);
 
     simu->pc = pc;
     simu->registers[SP] = sp;
@@ -51,7 +50,7 @@ void exec_all(QString file_name, char* sld_file) {
 
     init_instructions();
 
-    simu = create_simu_(MEMORY_SIZE, STACK_SIZE, 0, 0);
+    simu = create_simu_(0, 0);
 
     while(!input_text.isNull()) {
         buf = input_text.toUtf8().data();
@@ -78,10 +77,10 @@ void exec_all(QString file_name, char* sld_file) {
     while(!input_text_d.isNull()) {
         buf_d = input_text_d.toUtf8().data();
         uint32_t num = (uint32_t)strtol(buf_d, NULL, 2);
-        simu->stack_field[cnt_d] = (uint8_t)(num >> 24);
-        simu->stack_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->stack_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->stack_field[cnt_d + 3] = (uint8_t)(num & (0b11111111));
+        simu->data_field[cnt_d] = (uint8_t)(num >> 24);
+        simu->data_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->data_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->data_field[cnt_d + 3] = (uint8_t)(num & (0b11111111));
         input_text_d = in_d.readLine(256);
         cnt_d += 4;
     }
@@ -97,7 +96,7 @@ void exec_all(QString file_name, char* sld_file) {
         if(pre_pc == simu->pc) break;
         pre_pc = simu->pc;
 
-        if(opcode == 0b111111) break;
+        /* if(opcode == 0b111111) break; */
 
         if (instructions[opcode][funct][fmt] == NULL) {
             printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);

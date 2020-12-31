@@ -2,20 +2,45 @@
 
 #include "math.h"
 
+#define DATA_SIZE 440000
+#define STACK_SIZE 60000
+
 uint32_t ret_32bit(Simulator* simu, uint32_t from) {
-    uint8_t eight_bit0 = simu->stack_field[from];
-    uint8_t eight_bit1 = simu->stack_field[from + 1];
-    uint8_t eight_bit2 = simu->stack_field[from + 2];
-    uint8_t eight_bit3 = simu->stack_field[from + 3];
+    /* uint8_t eight_bit0 = simu->stack_field[from]; */
+    /* uint8_t eight_bit1 = simu->stack_field[from + 1]; */
+    /* uint8_t eight_bit2 = simu->stack_field[from + 2]; */
+    /* uint8_t eight_bit3 = simu->stack_field[from + 3]; */
+    uint8_t eight_bit0;
+    uint8_t eight_bit1;
+    uint8_t eight_bit2;
+    uint8_t eight_bit3;
+    if (from >= DATA_SIZE) {
+        eight_bit0 = simu->stack_field[from - DATA_SIZE];
+        eight_bit1 = simu->stack_field[from - DATA_SIZE + 1];
+        eight_bit2 = simu->stack_field[from - DATA_SIZE + 2];
+        eight_bit3 = simu->stack_field[from - DATA_SIZE + 3];
+    } else {
+        eight_bit0 = simu->data_field[from];
+        eight_bit1 = simu->data_field[from + 1];
+        eight_bit2 = simu->data_field[from + 2];
+        eight_bit3 = simu->data_field[from + 3];
+    }
     uint32_t inst = (uint32_t)((eight_bit0 << 24) | (eight_bit1 << 16) | (eight_bit2 << 8) | (eight_bit3));
     return inst;
 }
 
 void divide_8bits_store(Simulator* simu, uint32_t from, uint32_t num) {
-    simu->stack_field[from] = (uint8_t)(num >> 24);
-    simu->stack_field[from + 1] = (uint8_t)((num >> 16) & (0b11111111));
-    simu->stack_field[from + 2] = (uint8_t)((num >> 8) & (0b11111111));
-    simu->stack_field[from + 3] = (uint8_t)(num & (0b11111111));
+    if (from >= DATA_SIZE) {
+        simu->stack_field[from - DATA_SIZE] = (uint8_t)(num >> 24);
+        simu->stack_field[from - DATA_SIZE + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->stack_field[from - DATA_SIZE + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->stack_field[from - DATA_SIZE + 3] = (uint8_t)(num & (0b11111111));
+    } else {
+        simu->data_field[from] = (uint8_t)(num >> 24);
+        simu->data_field[from + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->data_field[from + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->data_field[from + 3] = (uint8_t)(num & (0b11111111));
+    }
 }
 
 uint32_t ret_inst_32bit(Simulator* simu) {

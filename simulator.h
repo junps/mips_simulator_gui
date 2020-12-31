@@ -15,6 +15,10 @@
 using namespace std;
 
 #define REGISTER_NUM 32
+#define THREAD_NUM 1
+
+#define DATA_SIZE 440000
+#define STACK_SIZE 60000
 
 enum Register { ZERO, AT, V0, V1, A0, A1, A2, A3, T0, T1, T2, T3, T4, T5, T6, T7,
                 S0, S1, S2, S3, S4, S5, S6, S7, T8, T9, K0, K1, GP, SP, FP, RA };
@@ -29,6 +33,7 @@ typedef struct {
     int condition_code[8];
 
     uint8_t* text_field;
+    uint8_t* data_field;
     uint8_t* stack_field;
 
     uint32_t pc; //program counter
@@ -39,6 +44,7 @@ struct Small_simu{
     float registers_f[REGISTER_NUM];
     int condition_code[8];
 
+    uint8_t* data;
     uint8_t* stack;
 
     uint32_t pc; //program counter
@@ -54,12 +60,14 @@ public:
     int siz;
     int mx_siz = 100;
     int ini_sp = 0;
-    int stack_size = 1024 * 1024;
+    int stack_size = STACK_SIZE;
 
     Small_simu *create_initial() {
         Small_simu* small_simu = (Small_simu*)malloc(sizeof(Small_simu));
-        small_simu->stack = (uint8_t*)malloc(stack_size + 1);
-        memset(small_simu->stack, 0, sizeof(uint8_t) * stack_size);
+        small_simu->data = (uint8_t*)malloc(DATA_SIZE + 1);
+        small_simu->stack = (uint8_t*)malloc(STACK_SIZE + 1);
+        memset(small_simu->stack, 0, sizeof(uint8_t) * STACK_SIZE);
+        memset(small_simu->data, 0, sizeof(uint8_t) * DATA_SIZE);
 
         memset(small_simu->registers, 0, sizeof(small_simu->registers));
         memset(small_simu->registers_f, 0, sizeof(small_simu->registers_f));
@@ -96,8 +104,11 @@ public:
 
         new_simu->pc = simu->pc;
 
-        for(int i = 0; i <= stack_size; i++) {
+        for(int i = 0; i <= STACK_SIZE; i++) {
             new_simu->stack[i] = simu->stack_field[ini_sp + i];
+        }
+        for(int i = 0; i <= DATA_SIZE; i++) {
+            new_simu->data[i] = simu->data_field[ini_sp + i];
         }
     }
 
@@ -107,11 +118,13 @@ public:
             if(boss->next == boss) {
                 return;
             } else if(boss->next->next == boss) {
+                free(boss->next->data);
                 free(boss->next->stack);
                 free(boss->next);
                 break;
             }
             boss->next = boss->next->next;
+            free(boss->next->prev->data);
             free(boss->next->prev->stack);
             free(boss->next->prev);
             boss->next->prev = boss;
@@ -136,8 +149,12 @@ public:
 
         simu->pc = now_node->pc;
 
-        for(int i = 0; i <= stack_size; i++) {
+        for(int i = 0; i <= STACK_SIZE; i++) {
             simu->stack_field[ini_sp + i] = now_node->stack[i];
+        }
+
+        for(int i = 0; i <= DATA_SIZE; i++) {
+            simu->data_field[ini_sp + i] = now_node->data[i];
         }
 
     }

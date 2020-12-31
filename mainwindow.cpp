@@ -17,8 +17,9 @@ using namespace std;
 
 #include <string.h>
 
-#define MEMORY_SIZE (2000000)
-#define STACK_SIZE (1024 * 1024)
+#define TEXT_SIZE 50000
+#define DATA_SIZE 440000
+#define STACK_SIZE 60000
 
 //extern FILE *fp_out;
 
@@ -30,16 +31,18 @@ string registers_name_f[] = {"F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8
                              "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22",
                              "F23", "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31"};
 
-Simulator* create_simu(size_t text_size, size_t stack_size, uint32_t pc, uint32_t sp) {
+Simulator* create_simu(uint32_t pc, uint32_t sp) {
     Simulator* simu = (Simulator*)malloc(sizeof(Simulator));
-    simu->text_field = (uint8_t*)malloc(text_size);
-    simu->stack_field = (uint8_t*)malloc(stack_size);
+    simu->text_field = (uint8_t*)malloc(TEXT_SIZE);
+    simu->stack_field = (uint8_t*)malloc(STACK_SIZE);
+    simu->data_field = (uint8_t*)malloc(DATA_SIZE);
 
     memset(simu->registers, 0, sizeof(simu->registers));
     memset(simu->registers_f, 0, sizeof(simu->registers));
     memset(simu->condition_code, 0, sizeof(simu->condition_code));
-    memset(simu->text_field, 0, text_size);
-    memset(simu->stack_field, 0, stack_size);
+    memset(simu->text_field, 0, TEXT_SIZE);
+    memset(simu->data_field, 0, DATA_SIZE);
+    memset(simu->stack_field, 0, STACK_SIZE);
 
     simu->pc = pc;
     simu->registers[SP] = sp;
@@ -50,6 +53,7 @@ Simulator* create_simu(size_t text_size, size_t stack_size, uint32_t pc, uint32_
 
 void destroy_simu(Simulator* simu) {
     free(simu->text_field);
+    free(simu->data_field);
     free(simu->stack_field);
     free(simu);
 }
@@ -103,10 +107,10 @@ void MainWindow::open_inst_file(QString inst_file) {
     while(!input_text_d.isNull()) {
         buf_d = input_text_d.toUtf8().data();
         uint32_t num = (uint32_t)strtol(buf_d, NULL, 2);
-        simu->stack_field[cnt_d] = (uint8_t)(num >> 24);
-        simu->stack_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->stack_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->stack_field[cnt_d + 3] = (uint8_t)(num & (0b11111111));
+        simu->data_field[cnt_d] = (uint8_t)(num >> 24);
+        simu->data_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->data_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->data_field[cnt_d + 3] = (uint8_t)(num & (0b11111111));
         input_text_d = in_d.readLine(256);
         cnt_d += 4;
     }
@@ -130,7 +134,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     init_instructions();
 
-    simu = create_simu(MEMORY_SIZE, STACK_SIZE, 0, 0);
+    simu = create_simu(0, 0);
 
     for(int i = 0; i < 32 + 32 + 1 + 8; i++) {
         ui->tableWidget_Registers->setRowHeight(i, 27);
@@ -714,7 +718,7 @@ void MainWindow::on_pushButton_Restart_released()
     memset(simu->registers, 0, sizeof(simu->registers));
     memset(simu->registers_f, 0, sizeof(simu->registers_f));
     memset(simu->condition_code, 0, sizeof(simu->condition_code));
-    memset(simu->text_field, 0, sizeof(uint8_t) * MEMORY_SIZE);
+    memset(simu->text_field, 0, sizeof(uint8_t) * TEXT_SIZE);
     memset(simu->stack_field, 0, sizeof(uint8_t) * STACK_SIZE);
     simu->pc = 0;
 
