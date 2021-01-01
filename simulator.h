@@ -15,7 +15,7 @@
 using namespace std;
 
 #define REGISTER_NUM 32
-#define THREAD_NUM 1
+#define THREAD_NUM 10
 
 #define DATA_SIZE 440000
 #define STACK_SIZE 60000
@@ -27,27 +27,37 @@ enum Register_f {F0, F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11,
                  F12, F13, F14, F15, F16, F17, F18, F19, F20, F21, F22,
                  F23, F24, F25, F26, F27, F28, F29, F30, F31};
 
+enum Mode {
+    Normal, Parallel
+};
+
 typedef struct {
-    int32_t registers[REGISTER_NUM];
-    float registers_f[REGISTER_NUM];
-    int condition_code[8];
+    Mode mode;
+
+    int32_t registers[THREAD_NUM][REGISTER_NUM];
+    float registers_f[THREAD_NUM][REGISTER_NUM];
+    int gc;
+    int gd;
+    int condition_code[THREAD_NUM][8];
 
     uint8_t* text_field;
     uint8_t* data_field;
-    uint8_t* stack_field;
+    uint8_t* stack_field[THREAD_NUM];
 
-    uint32_t pc; //program counter
+    uint32_t pc[THREAD_NUM]; //program counter
 } Simulator;
 
 struct Small_simu{
-    int32_t registers[REGISTER_NUM];
-    float registers_f[REGISTER_NUM];
-    int condition_code[8];
+    Mode mode;
+
+    int32_t registers[THREAD_NUM][REGISTER_NUM];
+    float registers_f[THREAD_NUM][REGISTER_NUM];
+    int condition_code[THREAD_NUM][8];
 
     uint8_t* data;
-    uint8_t* stack;
+    uint8_t* stack[THREAD_NUM];
 
-    uint32_t pc; //program counter
+    uint32_t pc[THREAD_NUM]; //program counter
 
     struct Small_simu *prev;
     struct Small_simu *next;
@@ -61,19 +71,21 @@ public:
     int mx_siz = 100;
     int ini_sp = 0;
     int stack_size = STACK_SIZE;
+    int data_size = DATA_SIZE;
 
     Small_simu *create_initial() {
         Small_simu* small_simu = (Small_simu*)malloc(sizeof(Small_simu));
         small_simu->data = (uint8_t*)malloc(DATA_SIZE + 1);
-        small_simu->stack = (uint8_t*)malloc(STACK_SIZE + 1);
-        memset(small_simu->stack, 0, sizeof(uint8_t) * STACK_SIZE);
         memset(small_simu->data, 0, sizeof(uint8_t) * DATA_SIZE);
 
-        memset(small_simu->registers, 0, sizeof(small_simu->registers));
-        memset(small_simu->registers_f, 0, sizeof(small_simu->registers_f));
-        memset(small_simu->condition_code, 0, sizeof(small_simu->condition_code));
-
-        small_simu->pc = 0;
+        for (int i=0; i<THREAD_NUM; i++) {
+            small_simu->stack[i] = (uint8_t*)malloc(STACK_SIZE + 1);
+            memset(small_simu->stack[i], 0, sizeof(uint8_t) * STACK_SIZE);
+            memset(small_simu->registers[i], 0, sizeof(small_simu->registers[0]));
+            memset(small_simu->registers_f[i], 0, sizeof(small_simu->registers_f[0]));
+            memset(small_simu->condition_code[i], 0, sizeof(small_simu->condition_code[0]));
+            small_simu->pc[i] = 0;
+        }
 
         small_simu->prev = NULL;
         small_simu->next = NULL;
@@ -90,23 +102,26 @@ public:
         new_simu->next = boss;
         now_node = new_simu;
 
-        for(int i = 0; i < 32; i++) {
-            new_simu->registers[i] = simu->registers[i];
+        for(int j=0; j<THREAD_NUM; j++) {
+            for(int i = 0; i < 32; i++) {
+                new_simu->registers[j][i] = simu->registers[j][i];
+            }
+
+            for(int i = 0; i < 32; i++) {
+                new_simu->registers_f[j][i] = simu->registers_f[j][i];
+            }
+
+            for(int i = 0; i < 8; i++) {
+                new_simu->condition_code[j][i] = simu->condition_code[j][i];
+            }
+
+            new_simu->pc[j] = simu->pc[j];
+
+            for(int i = 0; i <= STACK_SIZE; i++) {
+                new_simu->stack[j][i] = simu->stack_field[j][ini_sp + i];
+            }
         }
 
-        for(int i = 0; i < 32; i++) {
-            new_simu->registers_f[i] = simu->registers_f[i];
-        }
-
-        for(int i = 0; i < 8; i++) {
-            new_simu->condition_code[i] = simu->condition_code[i];
-        }
-
-        new_simu->pc = simu->pc;
-
-        for(int i = 0; i <= STACK_SIZE; i++) {
-            new_simu->stack[i] = simu->stack_field[ini_sp + i];
-        }
         for(int i = 0; i <= DATA_SIZE; i++) {
             new_simu->data[i] = simu->data_field[ini_sp + i];
         }
@@ -135,22 +150,24 @@ public:
     }
 
     void change_simu(Simulator* simu) {
-        for(int i = 0; i < 32; i++) {
-            simu->registers[i] = now_node->registers[i];
-        }
+        for (int j=0; j<THREAD_NUM; j++) {
+            for(int i = 0; i < 32; i++) {
+                simu->registers[j][i] = now_node->registers[j][i];
+            }
 
-        for(int i = 0; i < 32; i++) {
-            simu->registers_f[i] = now_node->registers_f[i];
-        }
+            for(int i = 0; i < 32; i++) {
+                simu->registers_f[j][i] = now_node->registers_f[j][i];
+            }
 
-        for(int i = 0; i < 8; i++) {
-            simu->condition_code[i] = now_node->condition_code[i];
-        }
+            for(int i = 0; i < 8; i++) {
+                simu->condition_code[j][i] = now_node->condition_code[j][i];
+            }
 
-        simu->pc = now_node->pc;
+            simu->pc[j] = now_node->pc[j];
 
-        for(int i = 0; i <= STACK_SIZE; i++) {
-            simu->stack_field[ini_sp + i] = now_node->stack[i];
+            for(int i = 0; i <= STACK_SIZE; i++) {
+                simu->stack_field[j][ini_sp + i] = now_node->stack[j][i];
+            }
         }
 
         for(int i = 0; i <= DATA_SIZE; i++) {

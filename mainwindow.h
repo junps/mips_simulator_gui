@@ -89,6 +89,8 @@ private:
 
     void display_last_register(Simulator* simu);
 
+    void display_last_data(Simulator* simu);
+
     void display_last_stacks(Simulator* simu);
 
     void open_inst_file(QString inst_file);

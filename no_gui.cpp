@@ -4,20 +4,22 @@
 
 Simulator* create_simu_(uint32_t pc, uint32_t sp) {
     Simulator* simu = (Simulator*)malloc(sizeof(Simulator));
+    simu->mode = Normal;
     simu->text_field = (uint8_t*)malloc(TEXT_SIZE);
-    simu->stack_field = (uint8_t*)malloc(STACK_SIZE);
     simu->data_field = (uint8_t*)malloc(DATA_SIZE);
-
-    memset(simu->registers, 0, sizeof(simu->registers));
-    memset(simu->registers_f, 0, sizeof(simu->registers));
-    memset(simu->condition_code, 0, sizeof(simu->condition_code));
     memset(simu->text_field, 0, TEXT_SIZE);
     memset(simu->data_field, 0, DATA_SIZE);
-    memset(simu->stack_field, 0, STACK_SIZE);
 
-    simu->pc = pc;
-    simu->registers[SP] = sp;
-    simu->registers[ZERO] = 0;
+    for (int i=0; i<THREAD_NUM; i++) {
+        simu->stack_field[i] = (uint8_t*)malloc(STACK_SIZE);
+        memset(simu->registers[i], 0, sizeof(simu->registers[0]));
+        memset(simu->registers_f[i], 0, sizeof(simu->registers[0]));
+        memset(simu->condition_code[i], 0, sizeof(simu->condition_code[0]));
+        memset(simu->stack_field[i], 0, STACK_SIZE);
+        simu->pc[i] = pc;
+        simu->registers[i][SP] = sp;
+        simu->registers[i][ZERO] = 0;
+    }
 
     return simu;
 }
@@ -88,22 +90,24 @@ void exec_all(QString file_name, char* sld_file) {
 
     uint32_t pre_pc = -1;
     while(1) {
-        uint32_t opcode = get_opcode(simu);
-        uint32_t funct = get_func(simu);
-        uint32_t fmt = get_fmt(simu);
+        for (int i=0; i<THREAD_NUM; i++) {
+            uint32_t opcode = get_opcode(simu, i);
+            uint32_t funct = get_func(simu, i);
+            uint32_t fmt = get_fmt(simu, i);
 
-//        printf("opcode : %d, funct : %d\n", opcode, funct);
-        if(pre_pc == simu->pc) break;
-        pre_pc = simu->pc;
+    //        printf("opcode : %d, funct : %d\n", opcode, funct);
+            /* if(pre_pc == simu->pc[0]) break; */
+            /* pre_pc = simu->pc[0]; */
 
-        /* if(opcode == 0b111111) break; */
+            /* if(opcode == 0b111111) break; */
 
-        if (instructions[opcode][funct][fmt] == NULL) {
-            printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-            printf("pc is %d\n", simu->pc / 4);
-            exit(1);
+            if (instructions[opcode][funct][fmt] == NULL) {
+                printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+                printf("pc is %d\n", simu->pc[0] / 4);
+                exit(1);
+            }
+
+            if (i == 0 || simu->mode == Parallel) instructions[opcode][funct][fmt](simu, i);
         }
-
-        instructions[opcode][funct][fmt](simu);
     }
 }

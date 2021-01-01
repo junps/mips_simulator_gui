@@ -9,7 +9,7 @@
 
 void init_instructions(void);
 
-typedef void instruction_func_t(Simulator*);
+typedef void instruction_func_t(Simulator*, int);
 
 extern instruction_func_t* instructions[64][64][8];
 
