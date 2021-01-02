@@ -432,15 +432,17 @@ void fork(Simulator* simu, int t) {
     simu->gd = get_imm(simu, t);
     simu->mode = Parallel;
 
-    for (int i=1; i<THREAD_NUM; i++) {
-        for (int j=0; j<REGISTER_NUM; j++) {
-            simu->registers[i][j] = simu->registers[0][j];
-            simu->registers_f[i][j] = simu->registers_f[0][j];
+    if (t == 0) {
+        for (int i=1; i<THREAD_NUM; i++) {
+            for (int j=0; j<REGISTER_NUM; j++) {
+                simu->registers[i][j] = simu->registers[0][j];
+                simu->registers_f[i][j] = simu->registers_f[0][j];
+            }
+            for (int j=0; j<STACK_SIZE; j++) {
+                simu->stack_field[i][j] = simu->stack_field[0][j];
+            }
+            simu->pc[i] = simu->pc[0];
         }
-        for (int j=0; j<STACK_SIZE; j++) {
-            simu->stack_field[i][j] = simu->stack_field[0][j];
-        }
-        simu->pc[i] = simu->pc[0] + 4;
     }
     simu->pc[t] += 4;
 }
@@ -448,7 +450,7 @@ void fork(Simulator* simu, int t) {
 void next(Simulator* simu, int t) {
     simu->registers[t][get_rt(simu, t)] = simu->gc;
     simu->gc += simu->gd;
-    simu->pc[t] += get_imm(simu, t) * 4 + 4;
+    simu->pc[t] += 4;
 }
 
 void end(Simulator* simu, int t) {

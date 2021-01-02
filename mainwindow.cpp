@@ -692,6 +692,7 @@ void MainWindow::on_pushButton_Next_released()
 {
     int loop_num = 0;
     while(loop_num < next_step) {
+        printf("gc:%d, gd%d\n", simu->gc, simu->gd);
         for (int i=0; i<THREAD_NUM; i++) {
             uint32_t opcode = get_opcode(simu, i);
             uint32_t funct = get_func(simu, i);
@@ -725,6 +726,7 @@ void MainWindow::on_pushButton_Next_released()
             }
 
             loop_num++;
+            printf("thread:%d, pc:%d\n", i, simu->pc[i]);
         }
     }
     heigh_light_row(simu->pc[0] / 4);
@@ -837,7 +839,7 @@ void MainWindow::on_pushButton_All_released()
 
     //        printf("opcode : %d, funct : %d\n", opcode, funct);
             if(i ==0) {
-                if(pre_pc == simu->pc[0]) goto end;
+                if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
                 pre_pc = simu->pc[0];
             }
 
