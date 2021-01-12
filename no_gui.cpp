@@ -98,6 +98,10 @@ void exec_all(QString file_name, char* sld_file) {
     //        printf("opcode : %d, funct : %d\n", opcode, funct);
             /* if(pre_pc == simu->pc[0]) break; */
             /* pre_pc = simu->pc[0]; */
+            if(i ==0) {
+                if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
+                pre_pc = simu->pc[0];
+            }
 
             /* if(opcode == 0b111111) break; */
 
@@ -110,4 +114,6 @@ void exec_all(QString file_name, char* sld_file) {
             if (i == 0 || simu->mode == Parallel) instructions[opcode][funct][fmt](simu, i);
         }
     }
+end:
+    return;
 }
