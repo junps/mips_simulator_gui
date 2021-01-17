@@ -56,6 +56,14 @@ Simulator* create_simu(uint32_t pc, uint32_t sp) {
     return simu;
 }
 
+void memory_dump(Simulator *simu) {
+    FILE *dump = fopen("./memory_dump.txt", "w");
+    for (int i=0; i<DATA_SIZE; i++) {
+        fprintf(dump, "%d: %x\n", i+1, simu->data_field[i]);
+    }
+    fclose(dump);
+}
+
 void destroy_simu(Simulator* simu) {
     free(simu->text_field);
     free(simu->data_field);
@@ -199,7 +207,7 @@ void MainWindow::InitialTableDisplay()
 
     ui->tableWidget_Registers->setAlternatingRowColors(true);
 
-    ui->tableWidget_Memory->setRowCount(l_lis.stack_size + 1);
+    ui->tableWidget_Memory->setRowCount(l_lis.data_size + 1);
     ui->tableWidget_Memory->setColumnCount(3);
 
 //    QStringList vlabels2;
@@ -213,7 +221,7 @@ void MainWindow::InitialTableDisplay()
     hlabels2 << "pre" << "now" << "next";
     ui->tableWidget_Memory->setHorizontalHeaderLabels(hlabels2);
 
-    for(int i = 0; i <= l_lis.stack_size; i++) {
+    for(int i = 0; i <= l_lis.data_size; i++) {
         for (int j = 0; j < 3; j++) {
             QTableWidgetItem *item = new QTableWidgetItem;
             item->setText(QString::number(0, 16));
@@ -837,7 +845,7 @@ void MainWindow::on_pushButton_All_released()
             uint32_t funct = get_func(simu, i);
             uint32_t fmt = get_fmt(simu, i);
 
-    //        printf("opcode : %d, funct : %d\n", opcode, funct);
+            /* printf("pc: %X\n", simu->pc[0]); */
             if(i ==0) {
                 if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
                 pre_pc = simu->pc[0];
@@ -898,7 +906,11 @@ void MainWindow::on_pushButton_Nbp_released()
 
     //        printf("opcode : %d, funct : %d\n", opcode, funct);
 
-            if(opcode == 0b111111) break;
+            printf("pc: %X\n", simu->pc[0]);
+            if(i ==0) {
+                if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
+                pre_pc = simu->pc[0];
+            }
 
             if (instructions[opcode][funct][fmt] == NULL) {
                 printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
@@ -906,23 +918,24 @@ void MainWindow::on_pushButton_Nbp_released()
                 exit(1);
             }
 
-            qDebug() << num_instructions;
-
-            if(pre_pc == simu->pc[0]) break;
-            pre_pc = simu->pc[0];
+            /* qDebug() << num_instructions; */
 
             if(!same && next_break_point == simu->pc[0]) break;
             same = false;
 
-            instructions[opcode][funct][fmt](simu, i);
+            if (i==0 || simu->mode==Parallel) instructions[opcode][funct][fmt](simu, i);
 
-            num_instructions++;
         }
+        num_instructions++;
     }
+end:
+
+    memory_dump(simu);
+
     heigh_light_row(simu->pc[0] / 4);
     display_last_register(simu);
     display_last_stacks(simu);
-    l_lis.delete_whole_l();
+    /* l_lis.delete_whole_l(); */
     l_lis.create_new(simu);
     l_lis.siz++;
 }
@@ -944,7 +957,7 @@ void MainWindow::on_pushButton_StopAt_released()
 
     //        printf("opcode : %d, funct : %d\n", opcode, funct);
 
-            if(opcode == 0b111111) break;
+            /* if(opcode == 0b111111) break; */
 
             if (instructions[opcode][funct][fmt] == NULL) {
                 printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
@@ -952,20 +965,25 @@ void MainWindow::on_pushButton_StopAt_released()
                 exit(1);
             }
 
-            if(pre_pc == simu->pc[0]) break;
-            pre_pc = simu->pc[0];
+            printf("pc: %X\n", simu->pc[0]);
+            if(i ==0) {
+                if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
+                pre_pc = simu->pc[0];
+            }
 
             if(cnt_inst == stop_at) break;
 
-            instructions[opcode][funct][fmt](simu, i);
+            if (i==0 || simu->mode == Parallel) instructions[opcode][funct][fmt](simu, i);
 
-            cnt_inst++;
         }
+        cnt_inst++;
     }
+end:
     heigh_light_row(simu->pc[0] / 4);
     display_last_register(simu);
-    display_last_stacks(simu);
-    l_lis.delete_whole_l();
+    /* display_last_stacks(simu); */
+    display_last_data(simu);
+    /* l_lis.delete_whole_l(); */
     l_lis.create_new(simu);
     l_lis.siz++;
 }
@@ -987,8 +1005,10 @@ void MainWindow::on_pushButton_SwStop_released()
                 exit(1);
             }
 
-            if(pre_pc == simu->pc[0]) break;
-            pre_pc = simu->pc[0];
+            if(i ==0) {
+                if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
+                pre_pc = simu->pc[0];
+            }
 
             if(opcode == 0b101011) {
                 uint32_t rs = get_rs(simu, i);
@@ -1001,10 +1021,12 @@ void MainWindow::on_pushButton_SwStop_released()
             instructions[opcode][funct][fmt](simu, i);
         }
     }
+end:
     heigh_light_row(simu->pc[0] / 4);
     display_last_register(simu);
-    display_last_stacks(simu);
-    l_lis.delete_whole_l();
+    /* display_last_stacks(simu); */
+    display_last_data(simu);
+    /* l_lis.delete_whole_l(); */
     l_lis.create_new(simu);
     l_lis.siz++;
 }
