@@ -17,6 +17,7 @@ using namespace std;
 #define REGISTER_NUM 32
 #define THREAD_NUM 5
 
+#define TEXT_SIZE 50000
 #define DATA_SIZE 440000
 #define STACK_SIZE 60000
 
@@ -184,5 +185,11 @@ public:
         siz = 0;
     }
 };
+
+// functions
+Simulator* create_simu(uint32_t pc, uint32_t sp);
+void execOneInstruction(Simulator* simu);
+void memory_dump(Simulator *simu);
+void destroy_simu(Simulator* simu);
 
 #endif // SIMULATOR_H

@@ -14,7 +14,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     no_gui.cpp \
-    simu_functions.cpp
+    simu_functions.cpp \
+    simulator.cpp
 
 HEADERS += \
     instruction.h \

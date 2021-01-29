@@ -17,61 +17,7 @@ using namespace std;
 
 #include <string.h>
 
-#define TEXT_SIZE 50000
-#define DATA_SIZE 440000
-#define STACK_SIZE 60000
-
 //extern FILE *fp_out;
-
-string registers_name[] = { "ZERO", "AT", "V0", "V1", "A0", "A1", "A2", "A3", "T0", "T1",
-                            "T2", "T3", "T4", "T5", "T6", "T7", "S0", "S1", "S2", "S3", "S4",
-                            "S5", "S6", "S7", "T8", "T9", "K0", "K1", "GP", "SP", "FP", "RA" };
-
-string registers_name_f[] = {"F0", "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10", "F11",
-                             "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "F20", "F21", "F22",
-                             "F23", "F24", "F25", "F26", "F27", "F28", "F29", "F30", "F31"};
-
-Simulator* create_simu(uint32_t pc, uint32_t sp) {
-    Simulator* simu = (Simulator*)malloc(sizeof(Simulator));
-    simu->mode = Normal;
-    simu->text_field = (uint8_t*)malloc(TEXT_SIZE);
-    simu->data_field = (uint8_t*)malloc(DATA_SIZE);
-    memset(simu->data_field, 0, DATA_SIZE);
-    memset(simu->text_field, 0, TEXT_SIZE);
-    simu->gc = 0;
-    simu->gd = 0;
-
-    for (int i=0; i<THREAD_NUM; i++) {
-        simu->stack_field[i] = (uint8_t*)malloc(STACK_SIZE);
-        memset(simu->registers[i], 0, sizeof(simu->registers[0]));
-        memset(simu->registers_f[i], 0, sizeof(simu->registers[0]));
-        memset(simu->condition_code[i], 0, sizeof(simu->condition_code[0]));
-        memset(simu->stack_field[i], 0, STACK_SIZE);
-
-        simu->pc[i] = pc;
-        simu->registers[i][SP] = sp;
-        simu->registers[i][ZERO] = 0;
-    }
-
-    return simu;
-}
-
-void memory_dump(Simulator *simu) {
-    FILE *dump = fopen("./memory_dump.txt", "w");
-    for (int i=0; i<DATA_SIZE; i++) {
-        fprintf(dump, "%d: %x\n", i+1, simu->data_field[i]);
-    }
-    fclose(dump);
-}
-
-void destroy_simu(Simulator* simu) {
-    free(simu->text_field);
-    free(simu->data_field);
-    for (int i=0; i<THREAD_NUM; i++) {
-        free(simu->stack_field[i]);
-    }
-    free(simu);
-}
 
 void MainWindow::open_inst_file(QString inst_file) {
     file_name = inst_file;
@@ -700,42 +646,25 @@ void MainWindow::on_pushButton_Next_released()
 {
     int loop_num = 0;
     while(loop_num < next_step) {
-        printf("gc:%d, gd%d\n", simu->gc, simu->gd);
-        for (int i=0; i<THREAD_NUM; i++) {
-            uint32_t opcode = get_opcode(simu, i);
-            uint32_t funct = get_func(simu, i);
-            uint32_t fmt = get_fmt(simu, i);
+        execOneInstruction(simu);
 
-    //        printf("opcode : %d, funct : %d\n", opcode, funct);
-
-            /* if(opcode == 0b111111) break; */
-
-            if (instructions[opcode][funct][fmt] == NULL) {
-                printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-                printf("pc is %d\n", simu->pc[0] / 4);
-                exit(1);
+        // TODO: Adapt this to Parallel mode
+        if(l_lis.now_node->next == l_lis.boss) {
+            l_lis.create_new(simu);
+            l_lis.siz++;
+            if(l_lis.siz > l_lis.mx_siz) {
+                l_lis.boss->next = l_lis.boss->next->next;
+                free(l_lis.boss->next->prev->stack[0]);
+                free(l_lis.boss->next->prev);
+                l_lis.boss->next->prev = l_lis.boss;
+                l_lis.siz--;
             }
-
-            if (i == 0 || simu->mode == Parallel) instructions[opcode][funct][fmt](simu, i);
-
-            if(l_lis.now_node->next == l_lis.boss) {
-                l_lis.create_new(simu);
-                l_lis.siz++;
-                if(l_lis.siz > l_lis.mx_siz) {
-                    l_lis.boss->next = l_lis.boss->next->next;
-                    free(l_lis.boss->next->prev->stack[i]);
-                    free(l_lis.boss->next->prev);
-                    l_lis.boss->next->prev = l_lis.boss;
-                    l_lis.siz--;
-                }
-            } else {
-                l_lis.now_node = l_lis.now_node->next;
-                l_lis.change_simu(simu);
-            }
-
-            loop_num++;
-            printf("thread:%d, pc:%d\n", i, simu->pc[i]);
+        } else {
+            l_lis.now_node = l_lis.now_node->next;
+            l_lis.change_simu(simu);
         }
+
+        loop_num++;
     }
     heigh_light_row(simu->pc[0] / 4);
     update_register_table();
@@ -831,8 +760,6 @@ void MainWindow::on_pushButton_Back_released()
     }
 }
 
-//int visited[12253];
-
 void MainWindow::on_pushButton_All_released()
 {
 
@@ -840,50 +767,18 @@ void MainWindow::on_pushButton_All_released()
     uint32_t pre_pc = -1;
 
     while(1) {
-        for (int i=0; i<THREAD_NUM; i++) {
-            uint32_t opcode = get_opcode(simu, i);
-            uint32_t funct = get_func(simu, i);
-            uint32_t fmt = get_fmt(simu, i);
+        execOneInstruction(simu);
 
-            /* printf("pc: %X\n", simu->pc[0]); */
-            if(i ==0) {
-                if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
-                pre_pc = simu->pc[0];
-            }
+        if(pre_pc == simu->pc[0] && get_opcode(simu, 0) != 0b111111) break;
+        pre_pc = simu->pc[0];
 
-            /* if(opcode == 0b111111) break; */
-
-            if (instructions[opcode][funct][fmt] == NULL) {
-                printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-                printf("pc is %d\n", simu->pc[i] / 4);
-                exit(1);
-            }
-
-#if DEBUG
-            if(num_instructions % 100 == 0) {
-                qDebug() << num_instructions;
-            }
-#endif
-
-            //visited[simu->pc / 4] = 1;
-
-            if (i == 0 || simu->mode == Parallel) instructions[opcode][funct][fmt](simu, i);
-
-        }
         num_instructions++;
     }
-end:
 
     heigh_light_row(simu->pc[0] / 4);
     display_last_register(simu);
     display_last_data(simu);
     qDebug() << "num_insructions " << num_instructions;
-
-//    for (int i = 0; i < 12253; i++) {
-//        if(visited[i] == 0) {
-//            qDebug() << i;
-//        }
-//    }
 }
 
 void MainWindow::on_spinBox_Nbp_valueChanged(int arg1)
@@ -899,36 +794,18 @@ void MainWindow::on_pushButton_Nbp_released()
     if(next_break_point == simu->pc[0]) same = true;
 
     while(1) {
-        for (int i=0; i<THREAD_NUM; i++) {
-            uint32_t opcode = get_opcode(simu, i);
-            uint32_t funct = get_func(simu, i);
-            uint32_t fmt = get_fmt(simu, i);
+        execOneInstruction(simu);
 
-    //        printf("opcode : %d, funct : %d\n", opcode, funct);
+        printf("pc: %X\n", simu->pc[0]);
 
-            printf("pc: %X\n", simu->pc[0]);
-            if(i ==0) {
-                if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
-                pre_pc = simu->pc[0];
-            }
+        if(pre_pc == simu->pc[0] && get_opcode(simu, 0) != 0b111111) break;
+        pre_pc = simu->pc[0];
 
-            if (instructions[opcode][funct][fmt] == NULL) {
-                printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-                printf("pc is %d\n", simu->pc[0] / 4);
-                exit(1);
-            }
+        if(!same && next_break_point == simu->pc[0]) break;
+        same = false;
 
-            /* qDebug() << num_instructions; */
-
-            if(!same && next_break_point == simu->pc[0]) break;
-            same = false;
-
-            if (i==0 || simu->mode==Parallel) instructions[opcode][funct][fmt](simu, i);
-
-        }
         num_instructions++;
     }
-end:
 
     memory_dump(simu);
 
@@ -950,35 +827,17 @@ void MainWindow::on_pushButton_StopAt_released()
     long long int pre_pc = -1, cnt_inst = 0;
 
     while(1) {
-        for (int i=0; i<THREAD_NUM; i++) {
-            uint32_t opcode = get_opcode(simu, i);
-            uint32_t funct = get_func(simu, i);
-            uint32_t fmt = get_fmt(simu, i);
+        execOneInstruction(simu);
 
-    //        printf("opcode : %d, funct : %d\n", opcode, funct);
+        printf("pc: %X\n", simu->pc[0]);
+        if(pre_pc == simu->pc[0] && get_opcode(simu, 0) != 0b111111) break;
+        pre_pc = simu->pc[0];
 
-            /* if(opcode == 0b111111) break; */
+        if(cnt_inst == stop_at) break;
 
-            if (instructions[opcode][funct][fmt] == NULL) {
-                printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-                printf("pc is %d\n", simu->pc[0] / 4);
-                exit(1);
-            }
-
-            printf("pc: %X\n", simu->pc[0]);
-            if(i ==0) {
-                if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
-                pre_pc = simu->pc[0];
-            }
-
-            if(cnt_inst == stop_at) break;
-
-            if (i==0 || simu->mode == Parallel) instructions[opcode][funct][fmt](simu, i);
-
-        }
         cnt_inst++;
     }
-end:
+
     heigh_light_row(simu->pc[0] / 4);
     display_last_register(simu);
     /* display_last_stacks(simu); */
@@ -993,35 +852,23 @@ void MainWindow::on_pushButton_SwStop_released()
     long long int pre_pc = -1;
 
     while(1) {
+        execOneInstruction(simu);
+
+        if(pre_pc == simu->pc[0] && get_opcode(simu, 0) != 0b111111) break;
+        pre_pc = simu->pc[0];
+
         for (int i=0; i<THREAD_NUM; i++) {
-            uint32_t opcode = get_opcode(simu, i);
-            uint32_t funct = get_func(simu, i);
-            uint32_t fmt = get_fmt(simu, i);
-
-
-            if (instructions[opcode][funct][fmt] == NULL) {
-                printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-                printf("pc is %d\n", simu->pc[0] / 4);
-                exit(1);
-            }
-
-            if(i ==0) {
-                if(pre_pc == simu->pc[0] && opcode != 0b111111) goto end;
-                pre_pc = simu->pc[0];
-            }
-
-            if(opcode == 0b101011) {
+            if(get_opcode(simu, i) == 0b101011) {
                 uint32_t rs = get_rs(simu, i);
                 int32_t imm = get_imm(simu, i);
                 if(simu->registers[0][rs] + imm == sw_stop) {
-                    break;
+                    goto end;
                 }
             }
-
-            instructions[opcode][funct][fmt](simu, i);
         }
     }
 end:
+
     heigh_light_row(simu->pc[0] / 4);
     display_last_register(simu);
     /* display_last_stacks(simu); */
