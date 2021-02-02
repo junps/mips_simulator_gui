@@ -15,7 +15,7 @@
 using namespace std;
 
 #define REGISTER_NUM 32
-#define THREAD_NUM 5
+#define THREAD_NUM 10
 
 #define TEXT_SIZE 50000
 #define DATA_SIZE 440000

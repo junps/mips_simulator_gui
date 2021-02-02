@@ -751,13 +751,11 @@ void MainWindow::on_pushButton_Back_released()
 
         back_simu(l_lis.now_node);
 
-        heigh_light_row(simu->pc[0] / 4);
-
-        update_register_table();
-        update_memory_table();
-
         loop_num++;
     }
+    heigh_light_row(simu->pc[0] / 4);
+    update_register_table();
+    update_memory_table();
 }
 
 void MainWindow::on_pushButton_All_released()

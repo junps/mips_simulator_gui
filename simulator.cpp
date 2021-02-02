@@ -36,15 +36,15 @@ void execOneInstruction(Simulator* simu) {
 
 //        printf("opcode : %d, funct : %d\n", opcode, funct);
 
-        /* if(opcode == 0b111111) break; */
-
         if (instructions[opcode][funct][fmt] == NULL) {
             printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
             printf("pc is %d\n", simu->pc[0] / 4);
             exit(1);
         }
 
-        if (i == 0 || simu->mode == Parallel) instructions[opcode][funct][fmt](simu, i);
+        instructions[opcode][funct][fmt](simu, i);
+
+        if(simu->mode == Normal) break;
 
         /* printf("thread:%d, pc:%d\n", i, simu->pc[i]); */
     }
