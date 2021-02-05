@@ -18,7 +18,7 @@ using namespace std;
 #define THREAD_NUM 10
 
 #define TEXT_SIZE 50000
-#define DATA_SIZE 440000
+#define DATA_SIZE 524288
 #define STACK_SIZE 60000
 
 enum Register { ZERO, AT, V0, V1, A0, A1, A2, A3, T0, T1, T2, T3, T4, T5, T6, T7,

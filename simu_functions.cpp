@@ -2,9 +2,6 @@
 
 #include "math.h"
 
-#define DATA_SIZE 440000
-#define STACK_SIZE 60000
-
 uint32_t ret_32bit(Simulator* simu, int thread, uint32_t from) {
     /* uint8_t eight_bit0 = simu->stack_field[from]; */
     /* uint8_t eight_bit1 = simu->stack_field[from + 1]; */
