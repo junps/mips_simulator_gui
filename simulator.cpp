@@ -48,40 +48,71 @@ void execOneInstruction(Simulator* simu) {
     /* printf("gc:%d, gd%d\n", simu->gc, simu->gd); */
     for (int i=0; i<THREAD_NUM; i++) {
         int templ = get_template(simu, i);
-        for (int j=0; j<3; j++) {
-            uint32_t opcode = get_opcode(simu, i, j);
-            uint32_t funct = get_func(simu, i, j);
-            uint32_t fmt = get_fmt(simu, i, j);
-
-            //debug
-            /* uint64_t instr = ret_inst_64bit(simu, i, j); */
-            /* printbit(instr, 41); */
-            /* printf("opcode:"); */
-            /* printbit(opcode, 6); */
-            /* printf("funct:"); */
-            /* printbit(funct, 6); */
-            /* printf("fmt:"); */
-            /* printbit(fmt, 3); */
-
-            if (instructions[opcode][funct][fmt] == NULL) {
-                printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-                printf("pc is %d\n", (simu->pc[0] / 4) * 3);
-                exit(1);
-            }
-
-            instructions[opcode][funct][fmt](simu, i, j);
-
-            //debug
-            /* printf("pc:%x\n", simu->pc[i]); */
-
-        }
+        uint32_t opcode, funct, fmt;
         switch (templ) {
             case 4:
             case 6:
             case 7:
+                opcode = get_opcode(simu, i, 1);
+                funct = get_func(simu, i, 1);
+                fmt = get_fmt(simu, i, 1);
+                if (instructions[opcode][funct][fmt] == NULL) {
+                    printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+                    printf("pc is %d\n", (simu->pc[0] / 4) * 3);
+                    exit(1);
+                }
+                instructions[opcode][funct][fmt](simu, i, 1);
+                opcode = get_opcode(simu, i, 0);
+                funct = get_func(simu, i, 0);
+                fmt = get_fmt(simu, i, 0);
+                if (instructions[opcode][funct][fmt] == NULL) {
+                    printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+                    printf("pc is %d\n", (simu->pc[0] / 4) * 3);
+                    exit(1);
+                }
+                instructions[opcode][funct][fmt](simu, i, 0);
+                opcode = get_opcode(simu, i, 2);
+                funct = get_func(simu, i, 2);
+                fmt = get_fmt(simu, i, 2);
+                if (instructions[opcode][funct][fmt] == NULL) {
+                    printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+                    printf("pc is %d\n", (simu->pc[0] / 4) * 3);
+                    exit(1);
+                }
+                instructions[opcode][funct][fmt](simu, i, 2);
+                break;
             case 8:
+                opcode = get_opcode(simu, i, 0);
+                funct = get_func(simu, i, 0);
+                fmt = get_fmt(simu, i, 0);
+                if (instructions[opcode][funct][fmt] == NULL) {
+                    printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+                    printf("pc is %d\n", (simu->pc[0] / 4) * 3);
+                    exit(1);
+                }
+                instructions[opcode][funct][fmt](simu, i, 0);
                 break;
             default:
+                for (int j=2; j>=0; j--) {
+                    opcode = get_opcode(simu, i, j);
+                    funct = get_func(simu, i, j);
+                    fmt = get_fmt(simu, i, j);
+                    //debug
+                    /* uint64_t instr = ret_inst_64bit(simu, i, j); */
+                    /* printbit(instr, 41); */
+                    /* printf("opcode:"); */
+                    /* printbit(opcode, 6); */
+                    /* printf("funct:"); */
+                    /* printbit(funct, 6); */
+                    /* printf("fmt:"); */
+                    /* printbit(fmt, 3); */
+                    if (instructions[opcode][funct][fmt] == NULL) {
+                        printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
+                        printf("pc is %d\n", (simu->pc[0] / 4) * 3);
+                        exit(1);
+                    }
+                    instructions[opcode][funct][fmt](simu, i, j);
+                }
                 simu->pc[i] += 4;
                 break;
         }
