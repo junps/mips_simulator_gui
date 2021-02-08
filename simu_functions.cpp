@@ -135,7 +135,11 @@ uint32_t get_shift(Simulator* simu, int t, int unit) {
 
 uint32_t get_func(Simulator* simu, int t, int unit) {
     uint64_t inst = ret_inst_64bit(simu, t, unit);
-    return ((inst) & (0x3f));
+    if ((inst >> 34) == 0b0100011)
+        // float case
+        return inst & 0x7;
+    else
+        return inst & 0x3f;
 }
 
 int32_t get_imm(Simulator* simu, int t, int unit) {

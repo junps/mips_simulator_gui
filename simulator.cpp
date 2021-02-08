@@ -58,10 +58,14 @@ void execOneInstruction(Simulator* simu) {
             /* printbit(instr, 41); */
             /* printf("opcode:"); */
             /* printbit(opcode, 6); */
+            /* printf("funct:"); */
+            /* printbit(funct, 6); */
+            /* printf("fmt:"); */
+            /* printbit(fmt, 3); */
 
             if (instructions[opcode][funct][fmt] == NULL) {
                 printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
-                printf("pc is %d\n", simu->pc[0] / 4);
+                printf("pc is %d\n", (simu->pc[0] / 4) * 3);
                 exit(1);
             }
 

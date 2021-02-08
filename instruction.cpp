@@ -214,7 +214,7 @@ static void out_f(Simulator* simu, int t, int unit) {
 
 void bt_s(Simulator* simu, int t, int unit) {
     uint32_t rt = get_rt(simu, t, unit);
-    uint32_t cc = (rt >> 2) & 0b111;
+    uint32_t cc = (rt >> 5) & 0b111;
     int32_t imm = get_imm(simu, t, unit);
     if(simu->condition_code[t][cc] == 1) {
         simu->pc[t] += (imm << 2) + 4;
@@ -225,7 +225,7 @@ void bt_s(Simulator* simu, int t, int unit) {
 
 void bf_s(Simulator* simu, int t, int unit) {
     uint32_t rt = get_rt(simu, t, unit);
-    uint32_t cc = (rt >> 2) & 0b111;
+    uint32_t cc = (rt >> 5) & 0b111;
     int32_t imm = get_imm(simu, t, unit);
     if(simu->condition_code[t][cc] == 0) {
         simu->pc[t] += (imm << 2) + 4;
@@ -237,7 +237,7 @@ void bf_s(Simulator* simu, int t, int unit) {
 void add_s(Simulator* simu, int t, int unit) {
     uint32_t fs = get_rd(simu, t, unit);
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
 
 #if NOT_FPU
     simu->registers_f[t][fd] = simu->registers_f[t][fs] + simu->registers_f[t][ft];
@@ -253,7 +253,7 @@ void add_s(Simulator* simu, int t, int unit) {
 void sub_s(Simulator* simu, int t, int unit) {
     uint32_t fs = get_rd(simu, t, unit);
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
 
 #if NOT_FPU
     simu->registers_f[t][fd] = simu->registers_f[t][fs] - simu->registers_f[t][ft];
@@ -269,7 +269,7 @@ void sub_s(Simulator* simu, int t, int unit) {
 void mul_s(Simulator* simu, int t, int unit) {
     uint32_t fs = get_rd(simu, t, unit);
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
 
 #if NOT_FPU
     simu->registers_f[t][fd] = simu->registers_f[t][fs] * simu->registers_f[t][ft];
@@ -285,7 +285,7 @@ void mul_s(Simulator* simu, int t, int unit) {
 void div_s(Simulator* simu, int t, int unit) {
     uint32_t fs = get_rd(simu, t, unit);
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
 
 #if NOT_FPU
     simu->registers_f[t][fd] = simu->registers_f[t][fs] / simu->registers_f[t][ft];
@@ -300,28 +300,28 @@ void div_s(Simulator* simu, int t, int unit) {
 
 void mov_s(Simulator* simu, int t, int unit) {
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
     simu->registers_f[t][fd] = simu->registers_f[t][ft];
     /* simu->pc[t] += 4; */
 }
 
 void neg_s(Simulator* simu, int t, int unit) {
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
     simu->registers_f[t][fd] = -simu->registers_f[t][ft];
     /* simu->pc[t] += 4; */
 }
 
 void abs_s(Simulator* simu, int t, int unit) {
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
     simu->registers_f[t][fd] = abs(simu->registers_f[t][ft]);
     /* simu->pc[t] += 4; */
 }
 
 void sqrt_s(Simulator* simu, int t, int unit) {
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
 
 #if NOT_FPU
     simu->registers_f[t][fd] = sqrt(simu->registers_f[t][ft]);
@@ -398,8 +398,8 @@ void cadd(Simulator* simu, int t, int unit) {
 void c_eq_s(Simulator* simu, int t, int unit) {
     uint32_t fs = get_rd(simu, t, unit);
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
-    uint32_t cc = (fd >> 2) & 0b111;
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
+    uint32_t cc = (fd >> 5) & 0b111;
     if (simu->registers_f[t][fs] == simu->registers_f[t][ft]) {
         simu->condition_code[t][cc] = 1;
     } else {
@@ -411,8 +411,8 @@ void c_eq_s(Simulator* simu, int t, int unit) {
 void c_lt_s(Simulator* simu, int t, int unit) {
     uint32_t fs = get_rd(simu, t, unit);
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
-    uint32_t cc = (fd >> 2) & 0b111;
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
+    uint32_t cc = (fd >> 5) & 0b111;
     if (simu->registers_f[t][fs] < simu->registers_f[t][ft]) {
         simu->condition_code[t][cc] = 1;
     } else {
@@ -424,8 +424,8 @@ void c_lt_s(Simulator* simu, int t, int unit) {
 void c_le_s(Simulator* simu, int t, int unit) {
     uint32_t fs = get_rd(simu, t, unit);
     uint32_t ft = get_rt(simu, t, unit);
-    uint32_t fd = ((get_imm(simu, t, unit) >> 6) & 0b11111);
-    uint32_t cc = (fd >> 2) & 0b111;
+    uint32_t fd = ((get_imm(simu, t, unit) >> 3) & 0xff);
+    uint32_t cc = (fd >> 5) & 0b111;
     if (simu->registers_f[t][fs] <= simu->registers_f[t][ft]) {
         simu->condition_code[t][cc] = 1;
     } else {
@@ -528,9 +528,9 @@ void init_instructions(void) {
     set_inst(0b010001, 0b000111, 0b100, 3, &neg_s);
     set_inst(0b010001, 0b000101, 0b100, 3, &abs_s);
     set_inst(0b010001, 0b000100, 0b100, 3, &sqrt_s);
-    set_inst(0b010001, 0b110010, 0b100, 3, &c_eq_s);
-    set_inst(0b010001, 0b111100, 0b100, 3, &c_lt_s);
-    set_inst(0b010001, 0b111110, 0b100, 3, &c_le_s);
+    set_inst(0b010001, 0b110010, 0b000, 3, &c_eq_s);
+    set_inst(0b010001, 0b111100, 0b000, 3, &c_lt_s);
+    set_inst(0b010001, 0b111110, 0b000, 3, &c_le_s);
     set_inst(0b110001, dummybit, dmfmt, 1, &lw_s);
     set_inst(0b111001, dummybit, dmfmt, 1, &sw_s);
     set_inst(0b111000, dummybit, dmfmt, 1, &ftoi);
