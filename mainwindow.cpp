@@ -24,36 +24,100 @@ void MainWindow::open_inst_file(QString inst_file) {
 
     string file_name_std = file_name.toStdString();
 
-    int n = file_name_std.size();
-    string base_name = file_name_std.substr(0, n - 9);
-    string data_name = base_name + "data.mem";
-    string debug_name = base_name + "debug.txt";
+    string base_name = file_name_std;
+    string text_name0 = base_name + "_instr0.mem";
+    string text_name1 = base_name + "_instr1.mem";
+    string text_name2 = base_name + "_instr2.mem";
+    string text_name3 = base_name + "_instr3.mem";
+    string data_name = base_name + "_data.mem";
+    string debug_name = base_name + "_debug.txt";
 
-    data_file = QString::fromStdString(data_name);
+    QString text_file0 = QString::fromStdString(text_name0);
+    QString text_file1 = QString::fromStdString(text_name1);
+    QString text_file2 = QString::fromStdString(text_name2);
+    QString text_file3 = QString::fromStdString(text_name3);
+    QString data_file = QString::fromStdString(data_name);
     QString debug_file = QString::fromStdString(debug_name);
 
     displayFile(debug_file);
 
-    QFile file(file_name);
-    if(!file.open(QFile::ReadOnly | QFile::Text)) {
+    QFile file0(text_file0);
+    if(!file0.open(QFile::ReadOnly | QFile::Text)) {
         QMessageBox::warning(this,"title","cannot open the file");
     }
-    QTextStream in(&file);
-    QString input_text = in.readLine();
+    QTextStream in0(&file0);
+    QString input_text = in0.readLine();
     int cnt = 0;
     char *buf;
     buf = (char *)calloc(1024, sizeof(char));
     while(!input_text.isNull()) {
         buf = input_text.toUtf8().data();
         uint32_t num = (uint32_t)strtol(buf, NULL, 2);
-        simu->text_field[cnt] = (uint8_t)(num >> 24);
-        simu->text_field[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->text_field[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->text_field[cnt + 3] = (uint8_t)(num & (0b11111111));
-        input_text = in.readLine(256);
+        simu->text_field0[cnt] = (uint8_t)(num >> 24);
+        simu->text_field0[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->text_field0[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->text_field0[cnt + 3] = (uint8_t)(num & (0b11111111));
+        input_text = in0.readLine(256);
         cnt += 4;
     }
-    file.close();
+    file0.close();
+    QFile file1(text_file1);
+    if(!file1.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"title","cannot open the file");
+    }
+    QTextStream in1(&file1);
+    input_text = in1.readLine();
+    cnt = 0;
+    buf = (char *)calloc(1024, sizeof(char));
+    while(!input_text.isNull()) {
+        buf = input_text.toUtf8().data();
+        uint32_t num = (uint32_t)strtol(buf, NULL, 2);
+        simu->text_field1[cnt] = (uint8_t)(num >> 24);
+        simu->text_field1[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->text_field1[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->text_field1[cnt + 3] = (uint8_t)(num & (0b11111111));
+        input_text = in1.readLine(256);
+        cnt += 4;
+    }
+    file1.close();
+    QFile file2(text_file2);
+    if(!file2.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"title","cannot open the file");
+    }
+    QTextStream in2(&file2);
+    input_text = in2.readLine();
+    cnt = 0;
+    buf = (char *)calloc(1024, sizeof(char));
+    while(!input_text.isNull()) {
+        buf = input_text.toUtf8().data();
+        uint32_t num = (uint32_t)strtol(buf, NULL, 2);
+        simu->text_field2[cnt] = (uint8_t)(num >> 24);
+        simu->text_field2[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->text_field2[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->text_field2[cnt + 3] = (uint8_t)(num & (0b11111111));
+        input_text = in2.readLine(256);
+        cnt += 4;
+    }
+    file2.close();
+    QFile file3(text_file3);
+    if(!file3.open(QFile::ReadOnly | QFile::Text)) {
+        QMessageBox::warning(this,"title","cannot open the file");
+    }
+    QTextStream in3(&file3);
+    input_text = in3.readLine();
+    cnt = 0;
+    buf = (char *)calloc(1024, sizeof(char));
+    while(!input_text.isNull()) {
+        buf = input_text.toUtf8().data();
+        uint32_t num = (uint32_t)strtol(buf, NULL, 2);
+        simu->text_field3[cnt] = (uint8_t)(num >> 24);
+        simu->text_field3[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->text_field3[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->text_field3[cnt + 3] = (uint8_t)(num & (0b11111111));
+        input_text = in3.readLine(256);
+        cnt += 4;
+    }
+    file3.close();
 
     QFile file_d(data_file);
     if(!file_d.open(QFile::ReadOnly | QFile::Text)) {
@@ -582,63 +646,130 @@ void MainWindow::display_last_stacks(Simulator *simu)
 
 void MainWindow::on_pushButton_Open_released()
 {
-    file_name = QFileDialog::getOpenFileName(this, "open a file","");
+    /* file_name = QFileDialog::getOpenFileName(this, "open a file",""); */
 
-    string file_name_std = file_name.toStdString();
+    /* string file_name_std = file_name.toStdString(); */
 
-    int n = file_name_std.size();
-    string base_name = file_name_std.substr(0, n - 9);
-    string data_name = base_name + "data.mem";
-    string debug_name = base_name + "debug.txt";
+    /* string base_name = file_name_std; */
+    /* string text_name0 = base_name + "_instr0.mem"; */
+    /* string text_name1 = base_name + "_instr1.mem"; */
+    /* string text_name2 = base_name + "_instr2.mem"; */
+    /* string text_name3 = base_name + "_instr3.mem"; */
+    /* string data_name = base_name + "_data.mem"; */
+    /* string debug_name = base_name + "_debug.txt"; */
 
-    data_file = QString::fromStdString(data_name);
-    QString debug_file = QString::fromStdString(debug_name);
+    /* QString text_file0 = QString::fromStdString(text_name0); */
+    /* QString text_file1 = QString::fromStdString(text_name1); */
+    /* QString text_file2 = QString::fromStdString(text_name2); */
+    /* QString text_file2 = QString::fromStdString(text_name2); */
+    /* QString data_file = QString::fromStdString(data_name); */
+    /* QString debug_file = QString::fromStdString(debug_name); */
 
-    displayFile(debug_file);
+    /* displayFile(debug_file); */
 
-    QFile file(file_name);
-    if(!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this,"title","cannot open the file");
-    }
-    QTextStream in(&file);
-    QString input_text = in.readLine();
-    int cnt = 0;
-    char *buf;
-    buf = (char *)calloc(1024, sizeof(char));
-    while(!input_text.isNull()) {
-        buf = input_text.toUtf8().data();
-        uint32_t num = (uint32_t)strtol(buf, NULL, 2);
-        simu->text_field[cnt] = (uint8_t)(num >> 24);
-        simu->text_field[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->text_field[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->text_field[cnt + 3] = (uint8_t)(num & (0b11111111));
-        input_text = in.readLine(256);
-        cnt += 4;
-    }
-    file.close();
+    /* QFile file(text_file0); */
+    /* if(!file0.open(QFile::ReadOnly | QFile::Text)) { */
+    /*     QMessageBox::warning(this,"title","cannot open the file"); */
+    /* } */
+    /* QTextStream in(&file0); */
+    /* QString input_text = in.readLine(); */
+    /* int cnt = 0; */
+    /* char *buf; */
+    /* buf = (char *)calloc(1024, sizeof(char)); */
+    /* while(!input_text.isNull()) { */
+    /*     buf = input_text.toUtf8().data(); */
+    /*     uint32_t num = (uint32_t)strtol(buf, NULL, 2); */
+    /*     simu->text_field0[cnt] = (uint8_t)(num >> 24); */
+    /*     simu->text_field0[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111)); */
+    /*     simu->text_field0[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111)); */
+    /*     simu->text_field0[cnt + 3] = (uint8_t)(num & (0b11111111)); */
+    /*     input_text = in.readLine(256); */
+    /*     cnt += 4; */
+    /* } */
+    /* file0.close(); */
+    /* QFile file(text_file1); */
+    /* if(!file1.open(QFile::ReadOnly | QFile::Text)) { */
+    /*     QMessageBox::warning(this,"title","cannot open the file"); */
+    /* } */
+    /* QTextStream in(&file1); */
+    /* QString input_text = in.readLine(); */
+    /* int cnt = 0; */
+    /* char *buf; */
+    /* buf = (char *)calloc(1024, sizeof(char)); */
+    /* while(!input_text.isNull()) { */
+    /*     buf = input_text.toUtf8().data(); */
+    /*     uint32_t num = (uint32_t)strtol(buf, NULL, 2); */
+    /*     simu->text_field1[cnt] = (uint8_t)(num >> 24); */
+    /*     simu->text_field1[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111)); */
+    /*     simu->text_field1[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111)); */
+    /*     simu->text_field1[cnt + 3] = (uint8_t)(num & (0b11111111)); */
+    /*     input_text = in.readLine(256); */
+    /*     cnt += 4; */
+    /* } */
+    /* file1.close(); */
+    /* QFile file(text_file2); */
+    /* if(!file2.open(QFile::ReadOnly | QFile::Text)) { */
+    /*     QMessageBox::warning(this,"title","cannot open the file"); */
+    /* } */
+    /* QTextStream in(&file2); */
+    /* QString input_text = in.readLine(); */
+    /* int cnt = 0; */
+    /* char *buf; */
+    /* buf = (char *)calloc(1024, sizeof(char)); */
+    /* while(!input_text.isNull()) { */
+    /*     buf = input_text.toUtf8().data(); */
+    /*     uint32_t num = (uint32_t)strtol(buf, NULL, 2); */
+    /*     simu->text_field2[cnt] = (uint8_t)(num >> 24); */
+    /*     simu->text_field2[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111)); */
+    /*     simu->text_field2[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111)); */
+    /*     simu->text_field2[cnt + 3] = (uint8_t)(num & (0b11111111)); */
+    /*     input_text = in.readLine(256); */
+    /*     cnt += 4; */
+    /* } */
+    /* file2.close(); */
+    /* QFile file(text_file3); */
+    /* if(!file3.open(QFile::ReadOnly | QFile::Text)) { */
+    /*     QMessageBox::warning(this,"title","cannot open the file"); */
+    /* } */
+    /* QTextStream in(&file3); */
+    /* QString input_text = in.readLine(); */
+    /* int cnt = 0; */
+    /* char *buf; */
+    /* buf = (char *)calloc(1024, sizeof(char)); */
+    /* while(!input_text.isNull()) { */
+    /*     buf = input_text.toUtf8().data(); */
+    /*     uint32_t num = (uint32_t)strtol(buf, NULL, 2); */
+    /*     simu->text_field3[cnt] = (uint8_t)(num >> 24); */
+    /*     simu->text_field3[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111)); */
+    /*     simu->text_field3[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111)); */
+    /*     simu->text_field3[cnt + 3] = (uint8_t)(num & (0b11111111)); */
+    /*     input_text = in.readLine(256); */
+    /*     cnt += 4; */
+    /* } */
+    /* file3.close(); */
 
-    QFile file_d(data_file);
-    if(!file_d.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this,"title","cannot open the file");
-    }
-    QTextStream in_d(&file_d);
-    QString input_text_d = in_d.readLine();
-    int cnt_d = 0;
-    char *buf_d;
-    buf_d = (char *)calloc(1024, sizeof(char));
+    /* QFile file_d(data_file); */
+    /* if(!file_d.open(QFile::ReadOnly | QFile::Text)) { */
+    /*     QMessageBox::warning(this,"title","cannot open the file"); */
+    /* } */
+    /* QTextStream in_d(&file_d); */
+    /* QString input_text_d = in_d.readLine(); */
+    /* int cnt_d = 0; */
+    /* char *buf_d; */
+    /* buf_d = (char *)calloc(1024, sizeof(char)); */
 
-    while(!input_text_d.isNull()) {
-        buf_d = input_text_d.toUtf8().data();
-        uint32_t num = (uint32_t)strtol(buf_d, NULL, 2);
-        simu->data_field[cnt_d] = (uint8_t)(num >> 24);
-        simu->data_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->data_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->data_field[cnt_d + 3] = (uint8_t)(num & (0b11111111));
-        input_text_d = in_d.readLine(256);
-        cnt_d += 4;
-    }
-    display_last_stacks(simu);
-    file_d.close();
+    /* while(!input_text_d.isNull()) { */
+    /*     buf_d = input_text_d.toUtf8().data(); */
+    /*     uint32_t num = (uint32_t)strtol(buf_d, NULL, 2); */
+    /*     simu->data_field[cnt_d] = (uint8_t)(num >> 24); */
+    /*     simu->data_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111)); */
+    /*     simu->data_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111)); */
+    /*     simu->data_field[cnt_d + 3] = (uint8_t)(num & (0b11111111)); */
+    /*     input_text_d = in_d.readLine(256); */
+    /*     cnt_d += 4; */
+    /* } */
+    /* display_last_stacks(simu); */
+    /* file_d.close(); */
 }
 
 
@@ -666,7 +797,7 @@ void MainWindow::on_pushButton_Next_released()
 
         loop_num++;
     }
-    heigh_light_row(simu->pc[0] / 4);
+    heigh_light_row((simu->pc[0] / 4) * 3);
     update_register_table();
     update_memory_table();
 }
@@ -678,64 +809,64 @@ void MainWindow::on_spinBox_valueChanged(int arg1)
 
 void MainWindow::on_pushButton_Restart_released()
 {
-    heigh_light_row(0);
+    /* heigh_light_row(0); */
 
-    memset(simu->registers, 0, sizeof(simu->registers));
-    memset(simu->registers_f, 0, sizeof(simu->registers_f));
-    memset(simu->condition_code, 0, sizeof(simu->condition_code));
-    memset(simu->text_field, 0, sizeof(uint8_t) * TEXT_SIZE);
-    memset(simu->stack_field, 0, sizeof(uint8_t) * STACK_SIZE);
-    for (int i=0; i<THREAD_NUM; i++) simu->pc[i] = 0;
+    /* memset(simu->registers, 0, sizeof(simu->registers)); */
+    /* memset(simu->registers_f, 0, sizeof(simu->registers_f)); */
+    /* memset(simu->condition_code, 0, sizeof(simu->condition_code)); */
+    /* memset(simu->text_field0, 0, sizeof(uint8_t) * TEXT_SIZE); */
+    /* memset(simu->stack_field, 0, sizeof(uint8_t) * STACK_SIZE); */
+    /* for (int i=0; i<THREAD_NUM; i++) simu->pc[i] = 0; */
 
-    QFile file(file_name);
-    if(!file.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this,"title","cannot open the file");
-    }
-    QTextStream in(&file);
-    QString input_text = in.readLine();
-    int cnt = 0;
-    char *buf;
-    buf = (char *)calloc(1024, sizeof(char));
+    /* QFile file(file_name); */
+    /* if(!file.open(QFile::ReadOnly | QFile::Text)) { */
+    /*     QMessageBox::warning(this,"title","cannot open the file"); */
+    /* } */
+    /* QTextStream in(&file); */
+    /* QString input_text = in.readLine(); */
+    /* int cnt = 0; */
+    /* char *buf; */
+    /* buf = (char *)calloc(1024, sizeof(char)); */
 
-    while(!input_text.isNull()) {
-        buf = input_text.toUtf8().data();
-        uint32_t num = (uint32_t)strtol(buf, NULL, 2);
-        simu->text_field[cnt] = (uint8_t)(num >> 24);
-        simu->text_field[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->text_field[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->text_field[cnt + 3] = (uint8_t)(num & (0b11111111));
-        input_text = in.readLine(256);
-        cnt += 4;
-    }
-    file.close();
+    /* while(!input_text.isNull()) { */
+    /*     buf = input_text.toUtf8().data(); */
+    /*     uint32_t num = (uint32_t)strtol(buf, NULL, 2); */
+    /*     /1* simu->text_field[cnt] = (uint8_t)(num >> 24); *1/ */
+    /*     /1* simu->text_field[cnt + 1] = (uint8_t)((num >> 16) & (0b11111111)); *1/ */
+    /*     /1* simu->text_field[cnt + 2] = (uint8_t)((num >> 8) & (0b11111111)); *1/ */
+    /*     /1* simu->text_field[cnt + 3] = (uint8_t)(num & (0b11111111)); *1/ */
+    /*     input_text = in.readLine(256); */
+    /*     cnt += 4; */
+    /* } */
+    /* file.close(); */
 
-    QFile file_d(data_file);
-    if(!file_d.open(QFile::ReadOnly | QFile::Text)) {
-        QMessageBox::warning(this,"title","cannot open the file");
-    }
-    QTextStream in_d(&file_d);
-    QString input_text_d = in_d.readLine();
-    int cnt_d = 0;
-    char *buf_d;
-    buf_d = (char *)calloc(1024, sizeof(char));
+    /* QFile file_d(data_file); */
+    /* if(!file_d.open(QFile::ReadOnly | QFile::Text)) { */
+    /*     QMessageBox::warning(this,"title","cannot open the file"); */
+    /* } */
+    /* QTextStream in_d(&file_d); */
+    /* QString input_text_d = in_d.readLine(); */
+    /* int cnt_d = 0; */
+    /* char *buf_d; */
+    /* buf_d = (char *)calloc(1024, sizeof(char)); */
 
-    while(!input_text_d.isNull()) {
-        buf_d = input_text_d.toUtf8().data();
-        uint32_t num = (uint32_t)strtol(buf_d, NULL, 2);
-        simu->data_field[cnt_d] = (uint8_t)(num >> 24);
-        simu->data_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->data_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->data_field[cnt_d + 3] = (uint8_t)(num & (0b11111111));
-        input_text_d = in_d.readLine(256);
-        cnt_d += 4;
-    }
-    file_d.close();
+    /* while(!input_text_d.isNull()) { */
+    /*     buf_d = input_text_d.toUtf8().data(); */
+    /*     uint32_t num = (uint32_t)strtol(buf_d, NULL, 2); */
+    /*     simu->data_field[cnt_d] = (uint8_t)(num >> 24); */
+    /*     simu->data_field[cnt_d + 1] = (uint8_t)((num >> 16) & (0b11111111)); */
+    /*     simu->data_field[cnt_d + 2] = (uint8_t)((num >> 8) & (0b11111111)); */
+    /*     simu->data_field[cnt_d + 3] = (uint8_t)(num & (0b11111111)); */
+    /*     input_text_d = in_d.readLine(256); */
+    /*     cnt_d += 4; */
+    /* } */
+    /* file_d.close(); */
 
-    l_lis.delete_whole_l();
+    /* l_lis.delete_whole_l(); */
 
-    InitialTableDisplay();
+    /* InitialTableDisplay(); */
 
-    display_last_stacks(simu);
+    /* display_last_stacks(simu); */
 }
 
 void MainWindow::on_pushButton_Back_released()
@@ -767,13 +898,13 @@ void MainWindow::on_pushButton_All_released()
     while(1) {
         execOneInstruction(simu);
 
-        if(pre_pc == simu->pc[0] && get_opcode(simu, 0) != 0b111111) break;
+        if(pre_pc == simu->pc[0] && get_opcode(simu, 0, 0) != 0b111111) break;
         pre_pc = simu->pc[0];
 
         num_instructions++;
     }
 
-    heigh_light_row(simu->pc[0] / 4);
+    heigh_light_row((simu->pc[0] / 4) * 3);
     display_last_register(simu);
     display_last_data(simu);
     qDebug() << "num_insructions " << num_instructions;
@@ -796,7 +927,7 @@ void MainWindow::on_pushButton_Nbp_released()
 
         printf("pc: %X\n", simu->pc[0]);
 
-        if(pre_pc == simu->pc[0] && get_opcode(simu, 0) != 0b111111) break;
+        if(pre_pc == simu->pc[0] && get_opcode(simu, 0, 0) != 0b111111) break;
         pre_pc = simu->pc[0];
 
         if(!same && next_break_point == simu->pc[0]) break;
@@ -828,7 +959,7 @@ void MainWindow::on_pushButton_StopAt_released()
         execOneInstruction(simu);
 
         printf("pc: %X\n", simu->pc[0]);
-        if(pre_pc == simu->pc[0] && get_opcode(simu, 0) != 0b111111) break;
+        if(pre_pc == simu->pc[0] && get_opcode(simu, 0, 0) != 0b111111) break;
         pre_pc = simu->pc[0];
 
         if(cnt_inst == stop_at) break;
@@ -852,13 +983,13 @@ void MainWindow::on_pushButton_SwStop_released()
     while(1) {
         execOneInstruction(simu);
 
-        if(pre_pc == simu->pc[0] && get_opcode(simu, 0) != 0b111111) break;
+        if(pre_pc == simu->pc[0] && get_opcode(simu, 0, 0) != 0b111111) break;
         pre_pc = simu->pc[0];
 
         for (int i=0; i<THREAD_NUM; i++) {
-            if(get_opcode(simu, i) == 0b101011) {
-                uint32_t rs = get_rs(simu, i);
-                int32_t imm = get_imm(simu, i);
+            if(get_opcode(simu, i, 0) == 0b101011) {
+                uint32_t rs = get_rs(simu, i, 0);
+                int32_t imm = get_imm(simu, i, 0);
                 if(simu->registers[0][rs] + imm == sw_stop) {
                     goto end;
                 }

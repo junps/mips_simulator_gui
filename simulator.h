@@ -41,7 +41,10 @@ typedef struct {
     int gd;
     int condition_code[THREAD_NUM][8];
 
-    uint8_t* text_field;
+    uint8_t* text_field0;
+    uint8_t* text_field1;
+    uint8_t* text_field2;
+    uint8_t* text_field3;
     uint8_t* data_field;
     uint8_t* stack_field[THREAD_NUM];
 

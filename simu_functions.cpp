@@ -40,66 +40,125 @@ void divide_8bits_store(Simulator* simu, int thread, uint32_t from, uint32_t num
     }
 }
 
-uint32_t ret_inst_32bit(Simulator* simu, int thread) {
-    uint8_t eight_bit0 = simu->text_field[simu->pc[thread]];
-    uint8_t eight_bit1 = simu->text_field[simu->pc[thread] + 1];
-    uint8_t eight_bit2 = simu->text_field[simu->pc[thread] + 2];
-    uint8_t eight_bit3 = simu->text_field[simu->pc[thread] + 3];
-    uint32_t inst = (uint32_t)((eight_bit0 << 24) | (eight_bit1 << 16) | (eight_bit2 << 8) | (eight_bit3));
+uint64_t ret_inst_64bit(Simulator* simu, int thread, int unit) {
+    uint8_t eight_bit0;
+    uint8_t eight_bit1;
+    uint8_t eight_bit2;
+    uint8_t eight_bit3;
+    uint8_t eight_bit4;
+    uint8_t eight_bit5;
+    uint64_t inst = 0b0;
+    switch (unit) {
+        case 0:
+            eight_bit0 = simu->text_field0[simu->pc[thread]];
+            eight_bit1 = simu->text_field0[simu->pc[thread] + 1];
+            eight_bit2 = simu->text_field0[simu->pc[thread] + 2];
+            eight_bit3 = simu->text_field0[simu->pc[thread] + 3];
+            eight_bit4 = simu->text_field1[simu->pc[thread] + 0];
+            eight_bit5 = simu->text_field1[simu->pc[thread] + 1];
+            inst =
+                ((1ul << 42) -1) &
+                    (((uint64_t)eight_bit0 << 33) |
+                     ((uint64_t)eight_bit1 << 25) |
+                     ((uint64_t)eight_bit2 << 17) |
+                     ((uint64_t)eight_bit3 << 9) |
+                     ((uint64_t)eight_bit4 << 1) |
+                     ((uint64_t)eight_bit5 >> 7));
+            break;
+        case 1:
+            eight_bit0 = simu->text_field1[simu->pc[thread] + 1];
+            eight_bit1 = simu->text_field1[simu->pc[thread] + 2];
+            eight_bit2 = simu->text_field1[simu->pc[thread] + 3];
+            eight_bit3 = simu->text_field2[simu->pc[thread] + 0];
+            eight_bit4 = simu->text_field2[simu->pc[thread] + 1];
+            eight_bit5 = simu->text_field2[simu->pc[thread] + 2];
+            inst =
+                ((1ul << 42) - 1) &
+                    ((((uint64_t)(eight_bit0 & 0b1111111) << 34)) |
+                     ((uint64_t)eight_bit1 << 26) |
+                     ((uint64_t)eight_bit2 << 18) |
+                     ((uint64_t)eight_bit3 << 10) |
+                     ((uint64_t)eight_bit4 << 2) |
+                     ((uint64_t)eight_bit5 >> 6));
+            break;
+        case 2:
+            eight_bit0 = simu->text_field2[simu->pc[thread] + 2];
+            eight_bit1 = simu->text_field2[simu->pc[thread] + 3];
+            eight_bit2 = simu->text_field3[simu->pc[thread] + 0];
+            eight_bit3 = simu->text_field3[simu->pc[thread] + 1];
+            eight_bit4 = simu->text_field3[simu->pc[thread] + 2];
+            eight_bit5 = simu->text_field3[simu->pc[thread] + 3];
+            inst =
+                ((1ul << 42) - 1) &
+                    ((((uint64_t)(eight_bit0 & 0b111111) << 35)) |
+                     ((uint64_t)eight_bit1 << 27) |
+                     ((uint64_t)eight_bit2 << 19) |
+                     ((uint64_t)eight_bit3 << 11) |
+                     ((uint64_t)eight_bit4 << 3) |
+                     ((uint64_t)eight_bit5 >> 5));
+            break;
+        default:
+            perror("undefined unit");
+            exit(1);
+    }
     return inst;
 }
 
-uint32_t get_opcode(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
-    return ((inst >> 26) & (0x3f));
+uint32_t get_template(Simulator* simu, int t) {
+    return simu->text_field3[simu->pc[t] + 3] & 0x1f;
 }
 
-uint32_t get_rs(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
-    return ((inst >> 21) & (0x1f));
+uint32_t get_opcode(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
+    return ((inst >> 35) & (0x3f));
 }
 
-uint32_t get_rt(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
-    return ((inst >> 16) & (0x1f));
+uint32_t get_rs(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
+    return ((inst >> 27) & (0xff));
 }
 
-uint32_t get_rd(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
-    return ((inst >> 11) & (0x1f));
+uint32_t get_rt(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
+    return ((inst >> 19) & (0xff));
 }
 
-uint32_t get_shift(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
+uint32_t get_rd(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
+    return ((inst >> 11) & (0xff));
+}
+
+uint32_t get_shift(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
     return ((inst >> 6) & (0x1f));
 }
 
-uint32_t get_func(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
+uint32_t get_func(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
     return ((inst) & (0x3f));
 }
 
-int32_t get_imm(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
-    if(((inst) & (1 << 15))) {
-        return (0xffff << 16) | (inst & (0xffff));
+int32_t get_imm(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
+    if(((inst) & (1 << 18))) {
+        return (0x1fff << 19) | (inst & (0x7ffff));
     }
-    return (inst & (0xffff));
+    return (inst & (0x7ffff));
 }
 
-uint32_t get_uimm(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
-    return (inst & 0xffff);
+uint32_t get_uimm(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
+    return (inst & 0x7ffff);
 }
 
-uint32_t get_address(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
-    return ((inst) & (0x3ffffff));
+uint32_t get_address(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
+    return (uint32_t) (inst & 0xffffffff);
 }
 
-uint32_t get_fmt(Simulator* simu, int t) {
-    uint32_t inst = ret_inst_32bit(simu, t);
-    return (((inst >> 24) & 3) << 1) | ((inst >> 16) & 1);
+uint32_t get_fmt(Simulator* simu, int t, int unit) {
+    uint64_t inst = ret_inst_64bit(simu, t, unit);
+    return (((inst >> 33) & 3) << 1) | ((inst >> 22) & 1);
 }
 
 union Single bare(union Single a){
