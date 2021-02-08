@@ -912,7 +912,7 @@ void MainWindow::on_pushButton_All_released()
 
 void MainWindow::on_spinBox_Nbp_valueChanged(int arg1)
 {
-    next_break_point = arg1 * 4;
+    next_break_point = arg1 * 4 / 3;
 }
 
 void MainWindow::on_pushButton_Nbp_released()
@@ -925,7 +925,7 @@ void MainWindow::on_pushButton_Nbp_released()
     while(1) {
         execOneInstruction(simu);
 
-        printf("pc: %X\n", simu->pc[0]);
+        printf("bp, pc: %X %X\n", next_break_point, simu->pc[0]);
 
         if(pre_pc == simu->pc[0] && get_opcode(simu, 0, 0) != 0b111111) break;
         pre_pc = simu->pc[0];
@@ -938,7 +938,7 @@ void MainWindow::on_pushButton_Nbp_released()
 
     memory_dump(simu);
 
-    heigh_light_row(simu->pc[0] / 4);
+    heigh_light_row((simu->pc[0] / 4) * 3);
     display_last_register(simu);
     display_last_stacks(simu);
     /* l_lis.delete_whole_l(); */

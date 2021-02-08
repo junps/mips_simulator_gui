@@ -54,10 +54,10 @@ void execOneInstruction(Simulator* simu) {
             uint32_t fmt = get_fmt(simu, i, j);
 
             //debug
-            uint64_t instr = ret_inst_64bit(simu, i, j);
-            printbit(instr, 41);
-            printf("opcode:");
-            printbit(opcode, 6);
+            /* uint64_t instr = ret_inst_64bit(simu, i, j); */
+            /* printbit(instr, 41); */
+            /* printf("opcode:"); */
+            /* printbit(opcode, 6); */
 
             if (instructions[opcode][funct][fmt] == NULL) {
                 printf("\n\nNot Implemented: opcode : %x, funct : %x\n", opcode, funct);
@@ -68,7 +68,7 @@ void execOneInstruction(Simulator* simu) {
             instructions[opcode][funct][fmt](simu, i, j);
 
             //debug
-            printf("pc:%x\n", simu->pc[i]);
+            /* printf("pc:%x\n", simu->pc[i]); */
 
         }
         switch (templ) {

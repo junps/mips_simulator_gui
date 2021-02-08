@@ -163,7 +163,7 @@ static void j(Simulator* simu, int t, int unit) {
     uint32_t addr = get_address(simu, t, unit);
     /* simu->pc[t] = (simu->pc[t] & 0xf0000000) | (addr << 2); */
     //debug
-    printf("addr:%x\n", addr);
+    /* printf("addr:%x\n", addr); */
     simu->pc[t] = (addr << 2);
 }
 
