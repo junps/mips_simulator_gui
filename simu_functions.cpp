@@ -27,38 +27,39 @@ uint32_t ret_32bit(Simulator* simu, int thread, uint32_t from) {
 }
 
 void divide_8bits_store(Simulator* simu, int thread, uint32_t from, uint32_t num, Mode m) {
-    if (m == Parallel) {
-        if (simu->spec_field[thread] == NULL) {
-            simu->spec_field[thread] = (Spec *)malloc(sizeof(Spec));
-            simu->spec_field[thread]->addr = from;
-            simu->spec_field[thread]->data = num;
-            simu->spec_field[thread]->next = NULL;
-            return;
-        }
-        Spec *s;
-        for (s = simu->spec_field[thread]; s->next != NULL && s->addr != from; s = s->next);
-        if (s == NULL) {
-            Spec *new_spec = (Spec *)malloc(sizeof(Spec));
-            new_spec->addr = from;
-            new_spec->data = num;
-            new_spec->next = NULL;
-            s->next = new_spec;
-            return;
-        } else {
-            s->data = num; return;
-        }
-    }
-    else {
-        if (from >= DATA_SIZE) {
-            simu->stack_field[thread][from - DATA_SIZE] = (uint8_t)(num >> 24);
-            simu->stack_field[thread][from - DATA_SIZE + 1] = (uint8_t)((num >> 16) & (0b11111111));
-            simu->stack_field[thread][from - DATA_SIZE + 2] = (uint8_t)((num >> 8) & (0b11111111));
-            simu->stack_field[thread][from - DATA_SIZE + 3] = (uint8_t)(num & (0b11111111));
-        } else {
+    if (from >= DATA_SIZE) {
+        simu->stack_field[thread][from - DATA_SIZE] = (uint8_t)(num >> 24);
+        simu->stack_field[thread][from - DATA_SIZE + 1] = (uint8_t)((num >> 16) & (0b11111111));
+        simu->stack_field[thread][from - DATA_SIZE + 2] = (uint8_t)((num >> 8) & (0b11111111));
+        simu->stack_field[thread][from - DATA_SIZE + 3] = (uint8_t)(num & (0b11111111));
+        return;
+    } else {
+        if (thread == 0) {
             simu->data_field[from] = (uint8_t)(num >> 24);
             simu->data_field[from + 1] = (uint8_t)((num >> 16) & (0b11111111));
             simu->data_field[from + 2] = (uint8_t)((num >> 8) & (0b11111111));
             simu->data_field[from + 3] = (uint8_t)(num & (0b11111111));
+        }
+        if (m == Parallel) {
+            if (simu->spec_list[thread] == NULL) {
+                simu->spec_list[thread] = (Spec *)malloc(sizeof(Spec));
+                simu->spec_list[thread]->addr = from;
+                simu->spec_list[thread]->data = num;
+                simu->spec_list[thread]->next = NULL;
+                return;
+            }
+            Spec *s;
+            for (s = simu->spec_list[thread]; s->next != NULL && s->addr != from; s = s->next);
+            if (s->next == NULL) {
+                Spec *new_spec = (Spec *)malloc(sizeof(Spec));
+                new_spec->addr = from;
+                new_spec->data = num;
+                new_spec->next = NULL;
+                s->next = new_spec;
+                return;
+            } else {
+                s->data = num; return;
+            }
         }
     }
 }

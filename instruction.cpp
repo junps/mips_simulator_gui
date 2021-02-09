@@ -53,7 +53,7 @@ static void lw(Simulator* simu, int t, int unit) {
     uint32_t from = simu->registers[t][rs] + imm;
     if (simu->mode == Parallel) {
         Spec *s;
-        for (s = simu->spec_field[t]; s != NULL && s->addr != from; s = s->next);
+        for (s = simu->spec_list[t]; s != NULL && s->addr != from; s = s->next);
         if (s == NULL) {
             simu->registers[t][rt] = ret_32bit(simu, t, from);
             return;
@@ -61,6 +61,9 @@ static void lw(Simulator* simu, int t, int unit) {
             simu->registers[t][rt] = s->data;
             return;
         }
+    } else {
+        simu->registers[t][rt] = ret_32bit(simu, t, from);
+        return;
     }
     /* simu->pc[t] += 4; */
 }
@@ -357,7 +360,7 @@ void lw_s(Simulator* simu, int t, int unit) {
     uint32_t from = simu->registers[t][rs] + imm;
     if (simu->mode == Parallel) {
         Spec *s;
-        for (s = simu->spec_field[t]; s != NULL && s->addr != from; s = s->next);
+        for (s = simu->spec_list[t]; s != NULL && s->addr != from; s = s->next);
         if (s == NULL) {
             num = ret_32bit(simu, t, from);
             union { float f; int i; } f_and_i;
@@ -371,6 +374,12 @@ void lw_s(Simulator* simu, int t, int unit) {
             simu->registers_f[t][ft] = f_and_i.f;
             return;
         }
+    } else {
+        num = ret_32bit(simu, t, from);
+        union { float f; int i; } f_and_i;
+        f_and_i.i = num;
+        simu->registers_f[t][ft] = f_and_i.f;
+        return;
     }
     /* simu->pc[t] += 4; */
 }

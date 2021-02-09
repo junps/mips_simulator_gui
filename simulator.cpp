@@ -20,12 +20,12 @@ Simulator* create_simu(uint32_t pc, uint32_t sp) {
 
     for (int i=0; i<THREAD_NUM; i++) {
         simu->stack_field[i] = (uint8_t*)malloc(STACK_SIZE);
-        simu->spec_field[i] = (Spec*)malloc(sizeof(Spec));
+        simu->spec_list[i] = (Spec*)malloc(sizeof(Spec));
         memset(simu->registers[i], 0, sizeof(simu->registers[0]));
         memset(simu->registers_f[i], 0, sizeof(simu->registers[0]));
         memset(simu->condition_code[i], 0, sizeof(simu->condition_code[0]));
         memset(simu->stack_field[i], 0, sizeof(simu->stack_field[0]));
-        simu->spec_field[i] = NULL;
+        simu->spec_list[i] = NULL;
 
         simu->pc[i] = pc;
         simu->registers[i][SP] = sp;

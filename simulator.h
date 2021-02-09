@@ -53,7 +53,7 @@ typedef struct {
     uint8_t* text_field3;
     uint8_t* data_field;
     uint8_t* stack_field[THREAD_NUM];
-    Spec* spec_field[THREAD_NUM];
+    Spec* spec_list[THREAD_NUM];
 
     uint32_t pc[THREAD_NUM]; //program counter
 } Simulator;

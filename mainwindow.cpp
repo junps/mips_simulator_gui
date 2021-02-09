@@ -904,6 +904,15 @@ void MainWindow::on_pushButton_All_released()
         num_instructions++;
     }
 
+    //debug
+    /* for (int t = 0; t < THREAD_NUM; t++){ */
+    /*     printf("thread: %d\n", t); */
+    /*     for (Spec *s = simu->spec_list[t]; s != NULL; s = s->next) { */
+    /*         printf("addr: %x\n", s->addr); */
+    /*         printf("data: %x\n", s->data); */
+    /*     } */
+    /* } */
+
     heigh_light_row((simu->pc[0] / 4) * 3);
     display_last_register(simu);
     display_last_data(simu);
