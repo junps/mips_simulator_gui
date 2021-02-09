@@ -48,8 +48,20 @@ static void lw(Simulator* simu, int t, int unit) {
     uint32_t rs = get_rs(simu, t, unit);
     uint32_t rt = get_rt(simu, t, unit);
     int32_t imm = get_imm(simu, t, unit);
-    int32_t num = ret_32bit(simu, t, simu->registers[t][rs] + imm);
-    simu->registers[t][rt] = num;
+    /* int32_t num = ret_32bit(simu, t, simu->registers[t][rs] + imm); */
+    int32_t num;
+    uint32_t from = simu->registers[t][rs] + imm;
+    if (simu->mode == Parallel) {
+        Spec *s;
+        for (s = simu->spec_field[t]; s != NULL && s->addr != from; s = s->next);
+        if (s == NULL) {
+            simu->registers[t][rt] = ret_32bit(simu, t, from);
+            return;
+        } else {
+            simu->registers[t][rt] = s->data;
+            return;
+        }
+    }
     /* simu->pc[t] += 4; */
 }
 
@@ -97,7 +109,7 @@ static void sw(Simulator* simu, int t, int unit) {
     uint32_t rs = get_rs(simu, t, unit);
     uint32_t rt = get_rt(simu, t, unit);
     int32_t imm = get_imm(simu, t, unit);
-    divide_8bits_store(simu, t, simu->registers[t][rs] + imm, simu->registers[t][rt]);
+    divide_8bits_store(simu, t, simu->registers[t][rs] + imm, simu->registers[t][rt], simu->mode);
     /* simu->pc[t] += 4; */
 }
 
@@ -337,10 +349,29 @@ void lw_s(Simulator* simu, int t, int unit) {
     uint32_t rs = get_rs(simu, t, unit);
     uint32_t ft = get_rt(simu, t, unit);
     int32_t imm = get_imm(simu, t, unit);
-    int32_t num = ret_32bit(simu, t, simu->registers[t][rs] + imm);
-    union { float f; int i; } f_and_i;
-    f_and_i.i = num;
-    simu->registers_f[t][ft] = f_and_i.f;
+    /* int32_t num = ret_32bit(simu, t, simu->registers[t][rs] + imm); */
+    /* union { float f; int i; } f_and_i; */
+    /* f_and_i.i = num; */
+    /* simu->registers_f[t][ft] = f_and_i.f; */
+    int32_t num;
+    uint32_t from = simu->registers[t][rs] + imm;
+    if (simu->mode == Parallel) {
+        Spec *s;
+        for (s = simu->spec_field[t]; s != NULL && s->addr != from; s = s->next);
+        if (s == NULL) {
+            num = ret_32bit(simu, t, from);
+            union { float f; int i; } f_and_i;
+            f_and_i.i = num;
+            simu->registers_f[t][ft] = f_and_i.f;
+            return;
+        } else {
+            num = s->data;
+            union { float f; int i; } f_and_i;
+            f_and_i.i = num;
+            simu->registers_f[t][ft] = f_and_i.f;
+            return;
+        }
+    }
     /* simu->pc[t] += 4; */
 }
 
@@ -350,7 +381,7 @@ void sw_s(Simulator* simu, int t, int unit) {
     int32_t imm = get_imm(simu, t, unit);
     union { float f; int i; } f_and_i;
     f_and_i.f = simu->registers_f[t][ft];
-    divide_8bits_store(simu, t, simu->registers[t][rs] + imm, f_and_i.i);
+    divide_8bits_store(simu, t, simu->registers[t][rs] + imm, f_and_i.i, simu->mode);
     /* simu->pc[t] += 4; */
 }
 
@@ -391,7 +422,7 @@ void cadd(Simulator* simu, int t, int unit) {
     union { float f; int i; } f_and_i;
     f_and_i.i = num;
     f_and_i.f += simu->registers_f[t][ft];
-    divide_8bits_store(simu, t, simu->registers[t][rs], f_and_i.i);
+    divide_8bits_store(simu, t, simu->registers[t][rs], f_and_i.i, Normal);
     /* simu->pc[t] += 4; */
 }
 

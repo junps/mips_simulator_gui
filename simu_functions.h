@@ -7,7 +7,7 @@
 
 uint32_t ret_32bit(Simulator* simu, int t, uint32_t from);
 
-void divide_8bits_store(Simulator* simu, int t, uint32_t from, uint32_t num);
+void divide_8bits_store(Simulator* simu, int t, uint32_t from, uint32_t num, Mode m);
 
 uint64_t ret_inst_64bit(Simulator* simu, int t, int unit);
 

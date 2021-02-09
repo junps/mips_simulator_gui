@@ -26,17 +26,40 @@ uint32_t ret_32bit(Simulator* simu, int thread, uint32_t from) {
     return inst;
 }
 
-void divide_8bits_store(Simulator* simu, int thread, uint32_t from, uint32_t num) {
-    if (from >= DATA_SIZE) {
-        simu->stack_field[thread][from - DATA_SIZE] = (uint8_t)(num >> 24);
-        simu->stack_field[thread][from - DATA_SIZE + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->stack_field[thread][from - DATA_SIZE + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->stack_field[thread][from - DATA_SIZE + 3] = (uint8_t)(num & (0b11111111));
-    } else {
-        simu->data_field[from] = (uint8_t)(num >> 24);
-        simu->data_field[from + 1] = (uint8_t)((num >> 16) & (0b11111111));
-        simu->data_field[from + 2] = (uint8_t)((num >> 8) & (0b11111111));
-        simu->data_field[from + 3] = (uint8_t)(num & (0b11111111));
+void divide_8bits_store(Simulator* simu, int thread, uint32_t from, uint32_t num, Mode m) {
+    if (m == Parallel) {
+        if (simu->spec_field[thread] == NULL) {
+            simu->spec_field[thread] = (Spec *)malloc(sizeof(Spec));
+            simu->spec_field[thread]->addr = from;
+            simu->spec_field[thread]->data = num;
+            simu->spec_field[thread]->next = NULL;
+            return;
+        }
+        Spec *s;
+        for (s = simu->spec_field[thread]; s->next != NULL && s->addr != from; s = s->next);
+        if (s == NULL) {
+            Spec *new_spec = (Spec *)malloc(sizeof(Spec));
+            new_spec->addr = from;
+            new_spec->data = num;
+            new_spec->next = NULL;
+            s->next = new_spec;
+            return;
+        } else {
+            s->data = num; return;
+        }
+    }
+    else {
+        if (from >= DATA_SIZE) {
+            simu->stack_field[thread][from - DATA_SIZE] = (uint8_t)(num >> 24);
+            simu->stack_field[thread][from - DATA_SIZE + 1] = (uint8_t)((num >> 16) & (0b11111111));
+            simu->stack_field[thread][from - DATA_SIZE + 2] = (uint8_t)((num >> 8) & (0b11111111));
+            simu->stack_field[thread][from - DATA_SIZE + 3] = (uint8_t)(num & (0b11111111));
+        } else {
+            simu->data_field[from] = (uint8_t)(num >> 24);
+            simu->data_field[from + 1] = (uint8_t)((num >> 16) & (0b11111111));
+            simu->data_field[from + 2] = (uint8_t)((num >> 8) & (0b11111111));
+            simu->data_field[from + 3] = (uint8_t)(num & (0b11111111));
+        }
     }
 }
 

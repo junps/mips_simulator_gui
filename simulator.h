@@ -32,6 +32,12 @@ enum Mode {
     Normal, Parallel
 };
 
+typedef struct spec {
+    uint32_t addr;
+    uint32_t data;
+    struct spec *next;
+} Spec;
+
 typedef struct {
     Mode mode;
 
@@ -47,6 +53,7 @@ typedef struct {
     uint8_t* text_field3;
     uint8_t* data_field;
     uint8_t* stack_field[THREAD_NUM];
+    Spec* spec_field[THREAD_NUM];
 
     uint32_t pc[THREAD_NUM]; //program counter
 } Simulator;
@@ -60,6 +67,7 @@ struct Small_simu{
 
     uint8_t* data;
     uint8_t* stack[THREAD_NUM];
+    Spec* spec[THREAD_NUM];
 
     uint32_t pc[THREAD_NUM]; //program counter
 
